@@ -1,0 +1,135 @@
+.login-page {
+  display: flex;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* IZQUIERDA: formulario */
+.login-left {
+  flex: 1;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
+}
+
+.logo {
+  width: 160px;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+form {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  label {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: #000;
+  }
+
+  input {
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 0.95rem;
+
+    &:focus {
+      border-color: #000;
+    }
+  }
+}
+
+/* Campo de contraseña con ícono */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  input {
+    flex: 1;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    color: #000;
+  }
+}
+
+/* Botón principal */
+.submit-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 1rem;
+
+  &:hover {
+    background: #333;
+  }
+
+  &:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+}
+
+/* DERECHA: imagen */
+.login-right {
+  flex: 1;
+  background-image: url('https://thefixers.gr/wp-content/uploads/2024/03/stock-credit_section-1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Adaptación para móviles */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-right {
+    display: none;
+  }
+
+  .login-left {
+    flex: none;
+    height: 100vh;
+    justify-content: center;
+  }
+}
