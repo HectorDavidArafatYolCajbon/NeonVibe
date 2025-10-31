@@ -1,0 +1,52 @@
+<section class="shirts-section">
+  <h2>zapatillas de hombre</h2>
+
+  <div class="shirts-grid">
+    <div class="shirts-card" *ngFor="let c of products" (click)="openModal(c)">
+      <img [src]="c.image" [alt]="c.name" />
+      <h3>{{ c.name }}</h3>
+      <p class="price">Q{{ c.price }} <span class="old">Q{{ c.oldPrice }}</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="selectedProduct">
+  <div class="modal-container">
+    <!-- Galería -->
+    <div class="modal-gallery">
+      <button class="close-x" (click)="closeModal()">×</button>
+
+      <div class="image-viewer">
+        <button class="nav-btn left" (click)="prevImage()">‹</button>
+        <img [src]="activeImage" class="main-image" alt="Vista principal" />
+        <button class="nav-btn right" (click)="nextImage()">›</button>
+      </div>
+
+      <div class="thumbnail-row">
+        <img
+          *ngFor="let img of selectedProduct.images"
+          [src]="img"
+          [class.active]="img === activeImage"
+          (click)="activeImage = img"
+        />
+      </div>
+    </div>
+
+    <!-- Detalles -->
+    <div class="modal-details">
+      <h3>{{ selectedProduct.name }}</h3>
+      <p class="price">Q{{ selectedProduct.price }}</p>
+      <p class="desc">{{ selectedProduct.description }}</p>
+
+      <div class="size-selector">
+        <label for="size">Talla:</label>
+        <select id="size" [(ngModel)]="selectedSize">
+          <option *ngFor="let s of selectedProduct.sizes">{{ s }}</option>
+        </select>
+      </div>
+
+      <button class="add-to-cart">Agregar a la Bolsa</button>
+    </div>
+  </div>
+</div>

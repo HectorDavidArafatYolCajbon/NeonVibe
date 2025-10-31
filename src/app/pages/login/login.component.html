@@ -1,5 +1,4 @@
 <div class="login-page">
-  <!-- SECCIÓN IZQUIERDA (Formulario y Logo) -->
   <div class="login-left">
     <img src="assets/logotipo_Ropa.png" alt="Logo" class="logo" />
 
@@ -37,8 +36,12 @@
         Submit
       </button>
     </form>
+
+    <!-- Aquí agregamos el enlace para crear un usuario -->
+    <div class="create-account">
+      <button mat-button (click)="openCreateUserDialog()">Crear Cuenta</button>
+    </div>
   </div>
 
-  <!-- SECCIÓN DERECHA (Imagen decorativa) -->
   <div class="login-right"></div>
 </div>

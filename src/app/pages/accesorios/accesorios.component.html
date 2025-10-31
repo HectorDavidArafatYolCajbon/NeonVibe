@@ -1,0 +1,80 @@
+<!-- Carrusel superior -->
+<div class="main-swiper swiper">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide" *ngFor="let img of pantsImages">
+      <img [src]="img" alt="Pantalones" />
+    </div>
+  </div>
+
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-pagination"></div>
+</div>
+
+<!-- Catálogo de productos -->
+<section class="pants-section">
+  <h2>ACCESORIOS PARA TI</h2>
+
+  <div class="pants-grid">
+    <div class="pants-card" *ngFor="let p of products" (click)="openModal(p)">
+      <img [src]="p.image" [alt]="p.name" />
+      <h3>{{ p.name }}</h3>
+      <p class="price">
+        Q{{ p.price }}
+        <span class="old">Q{{ p.oldPrice }}</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de producto -->
+<div class="modal-backdrop" *ngIf="selectedProduct">
+  <div class="modal-container">
+    <!-- COLUMNA IZQUIERDA: IMAGENES -->
+    <div class="modal-gallery">
+      <button class="close-x" (click)="closeModal()">×</button>
+
+      <div *ngIf="selectedProduct.gallery; else singleImage">
+        <div class="image-viewer">
+          <button class="nav-btn left" (click)="prevImage()">&#10094;</button>
+          <img [src]="activeImage" alt="Imagen principal" class="main-image" />
+          <button class="nav-btn right" (click)="nextImage()">&#10095;</button>
+        </div>
+
+        <div class="thumbnail-row">
+          <img
+            *ngFor="let img of selectedProduct.gallery"
+            [src]="img"
+            [class.active]="img === activeImage"
+            (click)="selectImage(img)"
+          />
+        </div>
+      </div>
+
+      <ng-template #singleImage>
+        <img [src]="selectedProduct.image" [alt]="selectedProduct.name" />
+      </ng-template>
+    </div>
+
+    <!-- COLUMNA DERECHA: DETALLE DEL PRODUCTO -->
+    <div class="modal-details">
+      <h3>{{ selectedProduct.name }}</h3>
+      <p class="price">Q{{ selectedProduct.price }}</p>
+
+      <p class="desc">
+        {{ selectedProduct.description }}
+      </p>
+
+      <div class="size-selector">
+        <label>Talla:</label>
+        <select>
+          <option>28 x 30</option>
+          <option>30 x 32</option>
+          <option>32 x 32</option>
+        </select>
+      </div>
+
+      <button class="add-to-cart">Agregar a la Bolsa</button>
+    </div>
+  </div>
+</div>
