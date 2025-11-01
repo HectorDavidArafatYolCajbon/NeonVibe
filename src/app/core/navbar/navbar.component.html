@@ -1,31 +1,50 @@
-<mat-toolbar color="primary" class="navbar">
-  <div class="container nav-inner">
-    <a class="logo" routerLink="/">MiTienda</a>
+<mat-toolbar class="navbar" color="primary">
+  <div class="navbar-content">
+    <!-- 🔹 Logo -->
+    <h1 class="logo" routerLink="/">NEONVIBE</h1>
 
-    <nav class="nav-links">
-      <button mat-button [matMenuTriggerFor]="hombres">Hombres</button>
+    <!-- 🔹 Menú principal -->
+    <div class="nav-menu">
+
+      <!-- HOMBRES -->
+      <button mat-button [matMenuTriggerFor]="hombres">HOMBRES</button>
       <mat-menu #hombres="matMenu">
-        <button mat-menu-item>Camisas</button>
-        <button mat-menu-item>Pantalones</button>
-        <button mat-menu-item>Zapatos</button>
+        <button mat-menu-item routerLink="/hombres/camisas">Camisas</button>
+        <button mat-menu-item routerLink="/hombres/pantalones">Pantalones</button>
+        <button mat-menu-item routerLink="/hombres/zapatos">Zapatos</button>
       </mat-menu>
 
-      <button mat-button [matMenuTriggerFor]="mujeres">Mujeres</button>
+      <!-- MUJERES -->
+      <button mat-button [matMenuTriggerFor]="mujeres">MUJERES</button>
       <mat-menu #mujeres="matMenu">
-        <button mat-menu-item>Vestidos</button>
-        <button mat-menu-item>Blusas</button>
-        <button mat-menu-item>Zapatos</button>
+        <button mat-menu-item routerLink="/mujeres/vestidos">Fald and vest</button>
+        <button mat-menu-item routerLink="/mujeres/blusas">Blusas</button>
+        <button mat-menu-item routerLink="/mujeres/zapatos">Zapatos</button>
       </mat-menu>
 
-      <button mat-button>Accesorios</button>
-      <button mat-button>Ofertas</button>
-      <button mat-button>Marcas</button>
-    </nav>
+      <!-- ACCESORIOS -->
+      <button mat-button routerLink="/accesorios">ACCESORIOS</button>
 
+      <!-- OFERTAS -->
+      <button mat-button routerLink="/ofertas">OFERTAS</button>
+
+      <!-- MARCAS -->
+      <button mat-button routerLink="/marcas">MARCAS</button>
+    </div>
+
+    <!-- 🔹 Íconos a la derecha -->
     <div class="icons">
-      <button mat-icon-button><mat-icon>search</mat-icon></button>
-      <button mat-icon-button><mat-icon>account_circle</mat-icon></button>
-      <button mat-icon-button><mat-icon>shopping_cart</mat-icon></button>
+      <button mat-icon-button aria-label="Carrito de compras" routerLink="/carrito">
+        <mat-icon>shopping_cart</mat-icon>
+      </button>
+
+      <button mat-icon-button aria-label="Favoritos" routerLink="/favoritos">
+        <mat-icon>favorite</mat-icon>
+      </button>
+
+      <button mat-icon-button aria-label="Cuenta" routerLink="/login">
+        <mat-icon>account_circle</mat-icon>
+      </button>
     </div>
   </div>
 </mat-toolbar>

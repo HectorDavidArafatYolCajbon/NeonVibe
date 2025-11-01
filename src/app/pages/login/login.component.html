@@ -1,0 +1,47 @@
+<div class="login-page">
+  <div class="login-left">
+    <img src="assets/logotipo_Ropa.png" alt="Logo" class="logo" />
+
+    <h2>Iniciar Sesión</h2>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email">Usuario</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+        />
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password">Contraseña</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="!loginForm.valid" class="submit-btn">
+        Submit
+      </button>
+    </form>
+
+    <!-- Aquí agregamos el enlace para crear un usuario -->
+    <div class="create-account">
+      <button mat-button (click)="openCreateUserDialog()">Crear Cuenta</button>
+    </div>
+  </div>
+
+  <div class="login-right"></div>
+</div>

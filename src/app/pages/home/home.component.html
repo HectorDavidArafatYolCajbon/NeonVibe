@@ -1,14 +1,31 @@
-<!-- 🔹 Banner superior con promociones -->
-<div class="banner-top">
-  <img src="/assets/portada1.jpg" alt="Promoción principal">
+<!-- Carrusel (NO TOCAR) -->
+<div class="main-swiper swiper">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide" *ngFor="let img of bannerImages">
+      <img [src]="img" alt="Banner" />
+    </div>
+  </div>
+
+  <!-- Controles de navegación -->
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+
+  <!-- Indicadores de paginación -->
+  <div class="swiper-pagination"></div>
 </div>
 
-<!-- 🔹 Sección destacada -->
-<section class="section-highlight">
+<!-- 🔹 Sección: WEEKLY DISCOVERY -->
+<section class="weekly-section">
   <h2>WEEKLY DISCOVERY</h2>
-  <div class="grid-products">
-    <div class="product" *ngFor="let item of weekly">
-      <img [src]="item.img" [alt]="item.title">
+
+  <div class="weekly-grid">
+    <!-- 🔗 Cada tarjeta se convierte en enlace -->
+    <div
+      class="weekly-item"
+      *ngFor="let item of weekly"
+      [routerLink]="item.link"
+    >
+      <img [src]="item.img" [alt]="item.title" />
       <h3>{{ item.title }}</h3>
     </div>
   </div>

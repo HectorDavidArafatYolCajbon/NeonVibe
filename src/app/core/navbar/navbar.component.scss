@@ -1,25 +1,148 @@
-mat-toolbar {
-  background: #111827; // gris oscuro elegante
-  color: white;
+.navbar {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  padding: 0.2rem 0 0.4rem 0; /* 👈 más delgada */
+  height: auto;
+}
 
-  .logo {
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-right: 2rem;
+/* CONTENEDOR PRINCIPAL */
+.navbar-content {
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.15rem; /* 👈 menor separación entre logo y menú */
+  padding: 0;
+}
+
+/* LOGO CENTRADO */
+.logo {
+  font-size: 2rem; /* 👈 ligeramente más pequeño */
+  letter-spacing: 0.6rem; /* menos espaciado */
+  text-transform: uppercase;
+  color: #fff;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* MENÚ CENTRAL DEBAJO DEL LOGO */
+.nav-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem; /* 👈 más compacto */
+  flex-wrap: nowrap;
+  margin-top: 0.15rem;
+}
+
+.nav-menu button {
+  color: #fff;
+  font-size: clamp(0.65rem, 0.9vw, 0.8rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  white-space: nowrap;
+  min-width: auto;
+  padding: 0;
+  transition: all 0.2s ease;
+  background: transparent;
+
+  &:hover {
+    color: #f4f4f4;
+    border-bottom: 2px solid #fff;
   }
+}
 
-  a {
-    color: white;
-    margin: 0 0.75rem;
-    text-decoration: none;
-    font-weight: 500;
+/* ICONOS DERECHA */
+.icons {
+  position: absolute;
+  right: 2rem;
+  top: 0.8rem; /* 👈 más arriba para la barra más delgada */
+  display: flex;
+  gap: 0.8rem;
 
-    &:hover {
-      color: #14b8a6; // verde-acento
+  button {
+    color: #fff;
+
+    mat-icon {
+      font-size: 22px;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
     }
   }
+}
 
-  .spacer {
-    flex: 1 1 auto;
+/* MENÚ DESPLEGABLE (SUBMENÚS) */
+.mat-mdc-menu-content {
+  background: #000;
+  color: #fff;
+
+  button.mat-mdc-menu-item {
+    color: #fff;
+
+    &:hover {
+      background: #222;
+    }
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .logo {
+    font-size: 1.6rem;
+    letter-spacing: 0.4rem;
+  }
+
+  .nav-menu {
+    gap: 1.8rem;
+  }
+
+  .nav-menu button {
+    font-size: 0.7rem;
+  }
+
+  .icons {
+    top: 0.7rem;
+    right: 1.5rem;
+
+    mat-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .logo {
+    font-size: 1.3rem;
+    letter-spacing: 0.3rem;
+  }
+
+  .nav-menu {
+    gap: 1rem;
+  }
+
+  .nav-menu button {
+    font-size: 0.65rem;
+  }
+
+  .icons {
+    top: 0.6rem;
+    right: 1rem;
   }
 }
