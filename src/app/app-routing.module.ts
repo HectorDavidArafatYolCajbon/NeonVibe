@@ -26,7 +26,7 @@ import { VestidosComponent } from './pages/mujeres/vestidos/vestidos.component';
 import { BlusasComponent } from './pages/mujeres/blusas/blusas.component';
 import { ZapatosMujeresComponent } from './pages/mujeres/zapatos-mujeres/zapatos-mujeres.component';
 
-
+import { HttpClientModule } from '@angular/common/http';
 
 
 const routes: Routes = [
@@ -72,7 +72,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes),
+    HttpClientModule
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}

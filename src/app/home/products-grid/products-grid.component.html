@@ -1,12 +1,31 @@
 <section class="container">
   <h2 class="section-title">{{ title }}</h2>
-  <div class="grid">
+
+  <div *ngIf="loading" class="loading">Cargando productos...</div>
+
+  <div *ngIf="!loading && products.length === 0" class="no-products">
+    No hay productos disponibles.
+  </div>
+
+  <div class="grid" *ngIf="!loading && products.length > 0">
     <mat-card class="card" *ngFor="let p of products">
       <img mat-card-image [src]="p.image" [alt]="p.name">
       <mat-card-content>
         <div class="name">{{ p.name }}</div>
-        <div class="price">{{ p.price | currency:'Q' }}</div>
+
+        <div *ngIf="p.descuento && p.descuento > 0; else normalPrice">
+          <div class="price">
+            <span class="old-price">{{ p.price / (1 - (p.descuento / 100)) | currency:'Q' }}</span>
+            <span class="discount">-{{ p.descuento }}%</span>
+          </div>
+          <div class="price-final">{{ p.price | currency:'Q' }}</div>
+        </div>
+
+        <ng-template #normalPrice>
+          <div class="price">{{ p.price | currency:'Q' }}</div>
+        </ng-template>
       </mat-card-content>
+
       <mat-card-actions>
         <button mat-stroked-button color="primary">Ver más</button>
         <button mat-raised-button color="primary">Agregar</button>
