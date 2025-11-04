@@ -1,104 +1,121 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ProductosService } from 'src/app/services/productos.service';
+import { Product } from 'src/app/models/product';
 
 @Component({
   selector: 'app-blusas',
   templateUrl: './blusas.component.html',
   styleUrls: ['./blusas.component.scss']
 })
-export class BlusasComponent {
-  products = [
-    {
-      name: 'Blusa Oversized Mujer Ae',
-      price: 199,
-      oldPrice: 249,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/444210-1200-auto?v=638724885215700000&width=1200&height=auto&aspect=true',
-      description: 'Camisa casual para hombre, cómoda y elegante para cualquier ocasión.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/444210-1200-auto?v=638724885215700000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/444211-1200-auto?v=638955520890230000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/444212-1200-auto?v=638955520890400000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/444213-1200-auto?v=638955520890400000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','S', 'M', 'L']
-    },
-    {
-      name: 'Camisa AE manga larga para mujer',
-      price: 219,
-      oldPrice: 289,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431681-1200-auto?v=638653209072100000&width=1200&height=auto&aspect=true',
-      description: 'Camisa formal con botones finos y corte moderno.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431681-1200-auto?v=638653209072100000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431691-1200-auto?v=638653209086600000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431693-1200-auto?v=638653209096600000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431695-1200-auto?v=638653209102670000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','M', 'L', 'XL']
-    },
-        {
-      name: 'Camisa Manga Larga Mujer AE',
-      price: 219,
-      oldPrice: 289,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/461023-1200-auto?v=638749077125130000&width=1200&height=auto&aspect=true',
-      description: 'Camisa formal con botones finos y corte moderno.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/461023-1200-auto?v=638749077125130000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/461029-1200-auto?v=638749077138330000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/461039-1200-auto?v=638749077150830000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/461055-1200-auto?v=638749077165230000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','M', 'L', 'XL']
-    },
-        {
-      name: 'Camisa Manga Larga cuello redondo Mujer AE',
-      price: 219,
-      oldPrice: 289,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/438050-1200-auto?v=638667013057700000&width=1200&height=auto&aspect=true',
-      description: 'Camisa formal con botones finos y corte moderno.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/438050-1200-auto?v=638667013057700000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/438051-1200-auto?v=638667013064470000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/438052-1200-auto?v=638667013066670000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/438053-1200-auto?v=638667013069270000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','M', 'L', 'XL']
-    },
-        {
-      name: 'Camisa negra AE manga larga para mujer',
-      price: 219,
-      oldPrice: 289,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431685-1200-auto?v=638653209077770000&width=1200&height=auto&aspect=true',
-      description: 'Camisa formal con botones finos y corte moderno.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431685-1200-auto?v=638653209077770000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431692-1200-auto?v=638653209094870000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431694-1200-auto?v=638653209099100000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/431699-1200-auto?v=638653209114830000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','M', 'L', 'XL']
-    },    {
-      name: 'Camisa AE manga larga oversized de cuadros con botones',
-      price: 219,
-      oldPrice: 289,
-      image: 'https://americaneagleguatemala.vtexassets.com/arquivos/ids/378221-1200-auto?v=638458734361700000&width=1200&height=auto&aspect=true',
-      description: 'Camisa formal con botones finos y corte moderno.',
-      images: [
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/378221-1200-auto?v=638458734361700000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/378228-1200-auto?v=638458734377630000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/378233-1200-auto?v=638458734388700000&width=1200&height=auto&aspect=true',
-        'https://americaneagleguatemala.vtexassets.com/arquivos/ids/378236-1200-auto?v=638458734405730000&width=1200&height=auto&aspect=true',
-      ],
-      sizes: ['XS','M', 'L', 'XL']
-    }
-  ];
-
-  selectedProduct: any = null;
+export class BlusasComponent implements OnInit {
+  products: Product[] = [];
+  selectedProduct: Product | null = null;
   activeImage: string = '';
   selectedSize: string = '';
+  loading = true;
 
-  openModal(product: any) {
-    this.selectedProduct = product;
-    this.activeImage = product.images[0];
+  constructor(private productosService: ProductosService) {}
+
+  ngOnInit(): void {
+    this.cargarBlusas();
+  }
+
+  /** 🩵 Cargar productos tipo blusa */
+  cargarBlusas(): void {
+    this.loading = true;
+    this.productosService.getVariantes().subscribe({
+      next: (data) => {
+        // 🔹 Filtrar solo productos tipo blusa
+        const blusas = data.filter(
+          (v: any) =>
+            v.producto?.nombre?.toLowerCase().includes('blusa') ||
+            v.modelo?.toLowerCase().includes('blusa')
+        );
+
+        const agrupadas: any = {};
+
+        for (const v of blusas) {
+          const idProducto = v.producto?.id_producto;
+
+          // ⛔️ Omitir variantes sin imágenes válidas
+          const tieneImagen =
+            (v.imagen_url && !v.imagen_url.includes('Sin+Imagen')) ||
+            (Array.isArray(v.imagenes) &&
+              v.imagenes.some((img: any) => img?.url && !img.url.includes('Sin+Imagen')));
+
+          if (!tieneImagen) continue;
+
+          if (!agrupadas[idProducto]) {
+            agrupadas[idProducto] = {
+              id: idProducto,
+              name: v.producto?.nombre || v.modelo,
+              description: v.producto?.descripcion || 'Sin descripción disponible',
+              color: v.color,
+              image:
+                v.imagen_url ||
+                v.imagenes?.[0]?.url ||
+                'https://via.placeholder.com/400x400?text=Sin+Imagen',
+              images: [],
+              sizes: [],
+              descuentos: [],
+              precios: []
+            };
+          }
+
+          // Combinar imágenes válidas
+          const nuevasImgs: string[] = [];
+          if (v.imagen_url) nuevasImgs.push(v.imagen_url);
+          if (Array.isArray(v.imagenes))
+            nuevasImgs.push(...v.imagenes.filter((i: any) => i?.url).map((i: any) => i.url));
+
+          agrupadas[idProducto].images = [
+            ...new Set([...(agrupadas[idProducto].images || []), ...nuevasImgs])
+          ];
+
+          agrupadas[idProducto].sizes.push({
+            talla: v.talla,
+            stock: v.stock?.stock ?? 0,
+            descuento: parseFloat(v.descuento ?? 0),
+            precio: parseFloat(v.precio_final ?? v.precio_venta ?? 0)
+          });
+
+          agrupadas[idProducto].descuentos.push(parseFloat(v.descuento ?? 0));
+          agrupadas[idProducto].precios.push(parseFloat(v.precio_final ?? v.precio_venta ?? 0));
+        }
+
+        this.products = Object.values(agrupadas)
+          .map((p: any) => {
+            const maxPrecio = Math.max(...p.precios);
+            const maxDesc = Math.max(...p.descuentos);
+            const minPrecio = Math.min(...p.precios);
+
+            return {
+              ...p,
+              descuento: maxDesc > 0 ? maxDesc : 0,
+              price: minPrecio,
+              oldPrice: maxDesc > 0 ? maxPrecio : minPrecio,
+              tieneRango: maxPrecio !== minPrecio
+            };
+          })
+          .filter((p: any) => Array.isArray(p.images) && p.images.length > 0);
+
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar blusas:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  openModal(product: Product) {
+    this.selectedProduct = { ...product };
+    this.activeImage = product.images?.[0] || '';
+    this.selectedSize = '';
+
+    this.selectedProduct.basePrice = product.price;
+    this.selectedProduct.baseOldPrice = product.oldPrice;
+    this.selectedProduct.baseDescuento = product.descuento;
   }
 
   closeModal() {
@@ -106,16 +123,64 @@ export class BlusasComponent {
   }
 
   nextImage() {
+    if (!this.selectedProduct?.images) return;
     const idx = this.selectedProduct.images.indexOf(this.activeImage);
     this.activeImage =
       this.selectedProduct.images[(idx + 1) % this.selectedProduct.images.length];
   }
 
   prevImage() {
+    if (!this.selectedProduct?.images) return;
     const idx = this.selectedProduct.images.indexOf(this.activeImage);
     this.activeImage =
       this.selectedProduct.images[
         (idx - 1 + this.selectedProduct.images.length) % this.selectedProduct.images.length
       ];
+  }
+
+  selectSize(size: any) {
+    if (!this.selectedProduct) return;
+    this.selectedSize = size.talla;
+
+    const variante = (this.productosService.cachedVariantes || []).find(
+      (v: any) =>
+        v.producto?.id_producto === this.selectedProduct?.id &&
+        v.talla === size.talla
+    );
+
+    if (variante) {
+      this.selectedProduct.price = parseFloat(
+        variante.precio_final ?? variante.precio_venta ?? this.selectedProduct.basePrice
+      );
+      this.selectedProduct.oldPrice = parseFloat(
+        variante.precio_venta ?? this.selectedProduct.baseOldPrice
+      );
+      this.selectedProduct.descuento = parseFloat(variante.descuento ?? 0);
+
+      const priceEl = document.querySelector('.modal-details .price') as HTMLElement;
+      if (priceEl) {
+        priceEl.classList.remove('price-change');
+        void priceEl.offsetWidth;
+        priceEl.classList.add('price-change');
+      }
+
+      const imgsVariante: string[] = [];
+      if (variante.imagen_url) imgsVariante.push(variante.imagen_url);
+      if (Array.isArray(variante.imagenes))
+        imgsVariante.push(...variante.imagenes.filter((i: any) => i?.url).map((i: any) => i.url));
+
+      const todasImgs = [
+        ...new Set([...(this.selectedProduct.images || []), ...imgsVariante])
+      ];
+
+      if (todasImgs.length > 0) {
+        this.selectedProduct.images = todasImgs;
+        this.activeImage = todasImgs[0];
+      }
+    } else {
+      this.selectedProduct.price = this.selectedProduct.basePrice;
+      this.selectedProduct.oldPrice = this.selectedProduct.baseOldPrice;
+      this.selectedProduct.descuento = this.selectedProduct.baseDescuento;
+    }
   }
 }
