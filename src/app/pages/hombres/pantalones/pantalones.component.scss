@@ -55,7 +55,6 @@
     letter-spacing: 0.05rem;
   }
 
-  /* ✅ 3 productos por fila */
   .pants-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -63,7 +62,6 @@
     justify-items: center;
     align-items: stretch;
 
-    /* Responsivo */
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -73,7 +71,6 @@
     }
   }
 
-  /* Tarjetas */
   .pants-card {
     background: #fff;
     border-radius: 10px;
@@ -137,9 +134,6 @@
   overflow-y: auto;
 }
 
-/* ============================================
-   🔹 MODAL PRODUCTO – DOS COLUMNAS
-============================================ */
 .modal-container {
   display: flex;
   flex-direction: row;
@@ -257,7 +251,7 @@
   }
 }
 
-/* ==== Detalle del producto (lado derecho) ==== */
+/* ==== Detalle del producto ==== */
 .modal-details {
   flex: 1;
   display: flex;
@@ -341,6 +335,17 @@
   color: #d32f2f;
 }
 
+/* ✅ Fuerza el color rojo del porcentaje en la tarjeta */
+.price-highlight .discount-badge,
+.price .discount-badge {
+  color: #fff;
+  background: #d32f2f;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
 .modal-details .price .discounted {
   color: #d32f2f;
   font-weight: 700;
@@ -353,7 +358,6 @@
   margin-left: 6px;
 }
 
-/* Botón cierre */
 .close-x.top-right {
   position: absolute;
   top: 15px;
@@ -373,7 +377,6 @@
   }
 }
 
-/* Tallas */
 .size-options {
   display: flex;
   flex-wrap: wrap;
@@ -417,7 +420,7 @@
 }
 
 /* =========================================
-   🔹 EFECTO DE CAMBIO DE PRECIO Y ANIMACIONES
+   🔹 EFECTOS Y ANIMACIONES
 ========================================= */
 .price-change {
   animation: priceFlash 0.5s ease;
@@ -455,5 +458,43 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* =========================================
+   🔹 BLOQUE DE PRECIO DESTACADO ("Desde Q..." y %)
+========================================= */
+.price-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .label {
+    color: #777;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .discounted {
+    color: #d32f2f;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .old {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .discount-badge {
+    background: #d32f2f;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
   }
 }

@@ -1,7 +1,7 @@
 /* ============================================
-   🔹 CATÁLOGO DE CAMISAS
+   🔹 CATÁLOGO DE ZAPATILLAS
 ============================================ */
-.shirts-section {
+.shoes-section {
   padding: 3rem 2rem;
   text-align: center;
   background: #fff;
@@ -14,14 +14,13 @@
   }
 
   /* ✅ 3 productos por fila */
-  .shirts-grid {
+  .shoes-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2.5rem;
     justify-items: center;
     align-items: stretch;
 
-    /* Responsivo */
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -32,7 +31,7 @@
   }
 
   /* Tarjetas */
-  .shirts-card {
+  .shoes-card {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
@@ -252,21 +251,6 @@
       font-weight: 600;
       color: #333;
     }
-
-    select {
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      cursor: pointer;
-      outline: none;
-      transition: border-color 0.2s ease;
-
-      &:hover,
-      &:focus {
-        border-color: #6a1b9a;
-      }
-    }
   }
 
   .add-to-cart {
@@ -289,25 +273,155 @@
   }
 }
 
-/* ============================================
-   🔹 ANIMACIONES
-============================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+/* === Reutilizamos todos los estilos de camisas === */
+.image-wrapper,
+.modal-image-wrapper {
+  position: relative;
+}
+
+.discount-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.price .discounted {
+  color: #d32f2f;
+}
+
+.modal-details .price .discounted {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.modal-details .price .modal-old {
+  color: #9e9e9e;
+  text-decoration: line-through;
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+.close-x.top-right {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: 0.25s ease;
+  z-index: 3000;
+
+  &:hover {
+    color: #e53935;
+    transform: scale(1.2);
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
+/* === Botones de tallas === */
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.size-btn {
+  background: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  color: #333;
+
+  &:hover {
+    border-color: #6a1b9a;
+    color: #6a1b9a;
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+
+  &.selected {
+    background-color: #6a1b9a;
+    color: white;
+    border-color: #6a1b9a;
+  }
+
+  &.out-of-stock {
+    background-color: #eee;
+    color: #aaa;
+    border-color: #ddd;
+    cursor: not-allowed;
+  }
+
+  span {
+    font-size: 0.75rem;
+    margin-left: 4px;
+    color: #777;
+  }
+}
+
+/* === Precio con rango y descuento === */
+.price-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+
+  .label {
+    color: #777;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .discounted {
+    color: #d32f2f;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .old {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.85rem;
+  }
+
+  .discount-badge {
+    background: #d32f2f;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+}
+
+/* === Animaciones === */
+.price-change {
+  animation: priceFlash 0.5s ease;
+}
+
+@keyframes priceFlash {
+  0% {
+    color: #6a1b9a;
+    transform: scale(1);
+  }
+  25% {
+    color: #d32f2f;
+    transform: scale(1.15);
+  }
+  100% {
+    color: #6a1b9a;
+    transform: scale(1);
   }
 }
