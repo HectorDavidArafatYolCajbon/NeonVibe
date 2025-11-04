@@ -1,14 +1,27 @@
 export interface Product {
-  id?: number;                // ID de la variante o producto
-  name: string;               // Nombre del producto o modelo
-  price: number;              // Precio actual (con descuento aplicado si lo hay)
-  oldPrice?: number;          // Precio original antes del descuento
-  image: string;              // Imagen principal
-  description?: string;       // Descripción del producto
-  images?: string[];          // Galería de imágenes
-  sizes?: string[];           // Tallas disponibles
-  color?: string;             // Color de la variante
-  talla?: string;             // Talla específica
-  descuento?: number;         // Descuento en porcentaje
-  precio_final?: number;      // Precio calculado con el descuento
+  id?: number;
+  name?: string;
+  price?: number;
+  oldPrice?: number;
+  descuento?: number;
+  description?: string;
+  image?: string;
+  images?: string[];
+  color?: string;
+
+  // 🔹 Para las tallas con stock
+  sizes?: {
+    talla: string;
+    stock: number;
+    descuento?: number;
+    precio?: number;
+  }[];
+
+  // 🔹 Indicador de rango de precios (para mostrar “Desde Q...”)
+  tieneRango?: boolean;
+
+  // 🔹 Precios base (para restaurar cuando cambias talla)
+  basePrice?: number;
+  baseOldPrice?: number;
+  baseDescuento?: number;
 }
