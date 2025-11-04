@@ -6,19 +6,19 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class ProductosService {
-
   private apiUrl = 'https://proyectoropa-ijsq.onrender.com/api/variantes';
 
-  // 🟢 Caché de variantes
+  // 🟢 Caché local de variantes
   cachedVariantes: any[] = [];
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Método único y corregido
+  // ✅ Método para obtener variantes con caché actualizada
   getVariantes(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
       tap((data: any[]) => {
-        this.cachedVariantes = data; // guarda todas las variantes localmente
+        // ✅ Guardamos variantes localmente para poder usarlas en selectSize()
+        this.cachedVariantes = data;
       })
     );
   }
