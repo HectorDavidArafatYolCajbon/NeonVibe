@@ -8,6 +8,7 @@ export interface Product {
   image?: string;
   images?: string[];
   color?: string;
+  talla?: string;
 
   // 🔹 Para las tallas con stock
   sizes?: {
