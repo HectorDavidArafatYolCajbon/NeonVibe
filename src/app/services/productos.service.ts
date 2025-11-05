@@ -22,4 +22,9 @@ export class ProductosService {
       })
     );
   }
+    // ✅ Nuevo método para obtener productos directamente del backend
+  getProductos(): Observable<any[]> {
+    return this.http.get<any[]>('https://proyectoropa-ijsq.onrender.com/api/productos');
+  }
+
 }

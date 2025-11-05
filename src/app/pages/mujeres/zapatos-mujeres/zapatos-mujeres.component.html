@@ -1,25 +1,63 @@
-<section class="shirts-section">
+<section class="zapmujer-section">
   <h2>ZAPATILLAS PARA TU GUSTO PERFECTO</h2>
 
-  <div class="shirts-grid">
-    <div class="shirts-card" *ngFor="let c of products" (click)="openModal(c)">
-      <img [src]="c.image" [alt]="c.name" />
-      <h3>{{ c.name }}</h3>
-      <p class="price">Q{{ c.price }} <span class="old">Q{{ c.oldPrice }}</span></p>
+  <!-- 🟢 Grid de productos -->
+  <div class="zapmujer-grid" *ngIf="!loading && products.length > 0">
+    <div class="zapmujer-card" *ngFor="let p of products" (click)="openModal(p)">
+      <div class="image-wrapper">
+        <img [src]="p.image" [alt]="p.name" />
+        <span *ngIf="p.descuento && p.descuento > 0" class="discount-label">
+          -{{ p.descuento }}%
+        </span>
+      </div>
+
+      <h3>{{ p.name }}</h3>
+
+      <!-- Precio -->
+      <ng-container *ngIf="p.descuento && p.descuento > 0; else normalPrice">
+        <p class="price price-highlight">
+          <span class="discounted">Q{{ p.price }}</span>
+          <span class="old">Q{{ p.oldPrice }}</span>
+          <span class="discount-badge">-{{ p.descuento }}%</span>
+        </p>
+      </ng-container>
+
+      <ng-template #normalPrice>
+        <p class="price">Q{{ p.price }}</p>
+      </ng-template>
     </div>
+  </div>
+
+  <!-- 🟡 Mostrar solo si terminó de cargar y no hay productos -->
+  <div class="no-products" *ngIf="!loading && products.length === 0">
+    <p>No se encontraron zapatillas disponibles.</p>
   </div>
 </section>
 
-<!-- Modal -->
+<!-- 🩷 Modal -->
 <div class="modal-backdrop" *ngIf="selectedProduct">
   <div class="modal-container">
-    <!-- Galería -->
-    <div class="modal-gallery">
-      <button class="close-x" (click)="closeModal()">×</button>
+    <button class="close-x top-right" (click)="closeModal()">×</button>
 
+    <div class="modal-gallery">
       <div class="image-viewer">
         <button class="nav-btn left" (click)="prevImage()">‹</button>
-        <img [src]="activeImage" class="main-image" alt="Vista principal" />
+
+        <div class="modal-image-wrapper">
+          <img
+            [src]="activeImage"
+            class="main-image"
+            alt="Vista principal"
+            onerror="this.src='https://via.placeholder.com/400x400?text=Sin+Imagen'"
+          />
+          <span
+            *ngIf="selectedProduct.descuento && selectedProduct.descuento > 0"
+            class="discount-label"
+          >
+            -{{ selectedProduct.descuento }}%
+          </span>
+        </div>
+
         <button class="nav-btn right" (click)="nextImage()">›</button>
       </div>
 
@@ -29,24 +67,62 @@
           [src]="img"
           [class.active]="img === activeImage"
           (click)="activeImage = img"
+          onerror="this.src='https://via.placeholder.com/100x100?text=Sin+Imagen'"
         />
       </div>
     </div>
 
-    <!-- Detalles -->
     <div class="modal-details">
       <h3>{{ selectedProduct.name }}</h3>
-      <p class="price">Q{{ selectedProduct.price }}</p>
+
+      <ng-container
+        *ngIf="selectedProduct.descuento && selectedProduct.descuento > 0; else normalModalPrice"
+      >
+        <p class="price">
+          <span class="discounted">Q{{ selectedProduct.price }}</span>
+          <span class="old modal-old">Q{{ selectedProduct.oldPrice }}</span>
+        </p>
+      </ng-container>
+
+      <ng-template #normalModalPrice>
+        <p class="price">Q{{ selectedProduct.price }}</p>
+      </ng-template>
+
       <p class="desc">{{ selectedProduct.description }}</p>
 
-      <div class="size-selector">
-        <label for="size">Talla:</label>
-        <select id="size" [(ngModel)]="selectedSize">
-          <option *ngFor="let s of selectedProduct.sizes">{{ s }}</option>
-        </select>
-      </div>
+      <!-- 📏 Selector de tallas -->
+      <ng-container *ngIf="selectedProduct?.sizes as sizes">
+        <div class="size-selector" *ngIf="sizes.length > 0">
+          <label>Tallas disponibles:</label>
+          <div class="size-options">
+            <button
+              *ngFor="let size of sizes"
+              class="size-btn"
+              [disabled]="size.stock === 0"
+              [class.selected]="selectedSize === size.talla"
+              [class.out-of-stock]="size.stock === 0"
+              (click)="selectSize(size)"
+            >
+              {{ size.talla }}
+              <span *ngIf="size.stock === 0">(Agotado)</span>
+              <span *ngIf="size.stock > 0">({{ size.stock }} disponibles)</span>
+            </button>
+          </div>
+        </div>
 
-      <button class="add-to-cart">Agregar a la Bolsa</button>
+        <!-- 👜 Botón de agregar -->
+        <button
+          class="add-to-cart"
+          [disabled]="!selectedSize"
+          (click)="addToCart(selectedProduct)"
+        >
+          Agregar a la Bolsa
+        </button>
+
+        <div class="no-sizes" *ngIf="sizes.length === 0">
+          <p>Sin tallas disponibles</p>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>
