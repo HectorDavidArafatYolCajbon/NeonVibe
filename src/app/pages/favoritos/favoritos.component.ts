@@ -18,15 +18,13 @@ export class FavoritosComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.subscription = this.favoritesService.favorites.subscribe(favorites => {
-      this.favorites = favorites;
-    });
+    this.subscription = this.favoritesService.favorites.subscribe(
+      favorites => this.favorites = favorites
+    );
   }
 
   ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    if (this.subscription) this.subscription.unsubscribe();
   }
 
   removeFromFavorites(item: any): void {

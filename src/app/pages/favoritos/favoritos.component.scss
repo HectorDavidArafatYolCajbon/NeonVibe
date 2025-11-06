@@ -9,7 +9,6 @@
     margin-bottom: 2rem;
   }
 
-  // Mensaje cuando no hay favoritos
   .empty-message {
     text-align: center;
     padding: 3rem 1rem;
@@ -28,14 +27,12 @@
     }
   }
 
-  // Grid de favoritos
   .favorites-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
   }
 
-  // Tarjeta de favorito
   .favorite-card {
     border: 1px solid #eee;
     border-radius: 8px;
@@ -102,7 +99,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 600px) {
   .favorites-container {
     padding: 1rem;
