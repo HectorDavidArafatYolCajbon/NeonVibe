@@ -120,7 +120,7 @@
 
       <!-- Contenedor de acciones -->
       <div class="actions-container">
-        <button class="add-to-cart" [disabled]="!selectedSize" (click)="addToCart(selectedProduct)">
+        <button class="add-to-cart" [disabled]="!selectedSize" (click)="addToCart()">
           Agregar al Carrito
         </button>
         <button mat-icon-button [color]="isInFavorites() ? 'warn' : ''"
