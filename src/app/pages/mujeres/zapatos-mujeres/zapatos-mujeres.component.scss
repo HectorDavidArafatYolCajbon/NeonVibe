@@ -355,31 +355,46 @@
     }
   }
 
-  /* ✅ BOTÓN "Agregar a la Bolsa" */
-  .add-to-cart {
+  /* ✅ Contenedor de acciones */
+  .actions-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-top: 1.2rem;
-    background-color: #c850c0;
-    color: white;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    align-self: start;
-    letter-spacing: 0.5px;
 
-    &:hover {
-      background-color: #a23ca8;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(200, 80, 192, 0.3);
+    .add-to-cart {
+      flex: 1;
+      background-color: #c850c0;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+
+      &:hover {
+        background-color: #a23ca8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(200, 80, 192, 0.3);
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        transform: none;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
     }
 
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-      box-shadow: none;
+    .mat-icon-button {
+      flex-shrink: 0;
+
+      &[color="warn"] {
+        color: #f44336;
+      }
     }
   }
 }

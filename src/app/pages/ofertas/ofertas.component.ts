@@ -1,23 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { Product } from 'src/app/models/product';
+import { CartService } from 'src/app/services/cart.service';
 
 @Component({
   selector: 'app-ofertas',
   templateUrl: './ofertas.component.html',
   styleUrls: ['./ofertas.component.scss']
 })
-export class OfertasComponent implements OnInit {
+export class OfertasComponent implements OnInit, OnDestroy {
+  isLoggedIn = false;
+  currentUser: any = null;
+  private userSubscription!: Subscription;
   products: Product[] = [];
   selectedProduct: Product | null = null;
   activeImage: string = '';
   selectedSize: string = '';
+  selectedVarianteId: number | null = null;
   loading = true;
 
-  constructor(private productosService: ProductosService) {}
+  constructor(private productosService: ProductosService, private cartService: CartService, private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.cargarOfertas();
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
   }
 
   /** 🔥 Cargar productos que tengan al menos una variante con descuento */
@@ -185,6 +198,8 @@ selectSize(size: any) {
   );
 
   if (variante) {
+    this.selectedVarianteId = variante.id_variante;
+
     const pv = parseFloat(variante.precio_venta ?? baseOld);
     const desc = parseFloat(variante.descuento ?? baseDesc);
     let pf = parseFloat(variante.precio_final ?? '0');
@@ -223,6 +238,79 @@ selectSize(size: any) {
     this.selectedProduct.price = basePrice;
     this.selectedProduct.oldPrice = baseOld;
     this.selectedProduct.descuento = baseDesc;
+    this.selectedVarianteId = null;
   }
 }
+
+/** 🛒 Agregar producto al carrito */
+addToCart(): void {
+  // 🧩 Validar que el producto y talla estén definidos
+  if (!this.selectedProduct) {
+    alert('Error: no hay producto seleccionado.');
+    return;
+  }
+
+  if (!this.selectedSize || !this.selectedVarianteId) {
+    alert('Por favor selecciona una talla antes de agregar al carrito.');
+    return;
+  }
+
+  // 🧩 Validar que el arreglo sizes exista antes de buscar
+  const selectedSizeData = this.selectedProduct.sizes?.find(
+    (s: any) => s.talla === this.selectedSize
+  );
+
+  if (!selectedSizeData) {
+    alert('Error: talla no encontrada o sin información de stock.');
+    return;
+  }
+
+  const stockDisponible = selectedSizeData.stock ?? 0;
+  if (stockDisponible <= 0) {
+    alert('🚫 Este producto está agotado.');
+    return;
+  }
+
+  // 🧩 Obtener carrito actual
+  const currentCart = this.cartService.getCart();
+  const existing = currentCart.find(
+    (item: any) =>
+      item.id_variante === this.selectedVarianteId &&
+      item.talla === this.selectedSize
+  );
+
+  if (existing) {
+    if (existing.cantidad >= stockDisponible) {
+      alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+      return;
+    }
+    existing.cantidad++;
+    this.cartService.saveCart(currentCart);
+  } else {
+    const productToAdd = {
+      id_variante: this.selectedVarianteId,
+      name: this.selectedProduct.name,
+      talla: this.selectedSize,
+      image: this.activeImage,
+      precio_final: this.selectedProduct.price,
+      cantidad: 1,
+      stock: stockDisponible
+    };
+    this.cartService.addToCart(productToAdd);
+  }
+
+  alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+  this.closeModal();
+}
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
 }

@@ -1,7 +1,12 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import Swiper from 'swiper';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { ProductosService } from 'src/app/services/productos.service';
+import { CartService } from 'src/app/services/cart.service';
+import { FavoritesService } from 'src/app/services/favorites.service';
 import { Product } from 'src/app/models/product';
 
 @Component({
@@ -9,7 +14,11 @@ import { Product } from 'src/app/models/product';
   templateUrl: './accesorios.component.html',
   styleUrls: ['./accesorios.component.scss']
 })
-export class AccesoriosComponent implements OnInit, AfterViewInit {
+export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
+  isLoggedIn = false;
+  currentUser: any = null;
+  private userSubscription!: Subscription;
+  selectedVarianteId: number | null = null;
   products: Product[] = [];
   selectedProduct: Product | null = null;
   activeImage: string = '';
@@ -23,10 +32,21 @@ export class AccesoriosComponent implements OnInit, AfterViewInit {
     'https://images.unsplash.com/photo-1569388330292-79cc1ec67270?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170'
   ];
 
-  constructor(private productosService: ProductosService) {}
+  constructor(
+    private productosService: ProductosService,
+    private cartService: CartService,
+    private authService: AuthService,
+    private router: Router,
+    private favoritesService: FavoritesService
+  ) {}
 
   ngOnInit(): void {
     this.cargarAccesorios();
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
   }
 
   /** 🌀 Inicializar carrusel Swiper */
@@ -172,6 +192,7 @@ export class AccesoriosComponent implements OnInit, AfterViewInit {
     );
 
     if (variante) {
+      this.selectedVarianteId = variante.id_variante;
       this.selectedProduct.price = parseFloat(
         variante.precio_final ?? variante.precio_venta ?? (this.selectedProduct as any).basePrice
       );
@@ -187,9 +208,112 @@ export class AccesoriosComponent implements OnInit, AfterViewInit {
         priceEl.classList.add('price-change');
       }
     } else {
+      this.selectedVarianteId = null;
       this.selectedProduct.price = (this.selectedProduct as any).basePrice ?? 0;
       this.selectedProduct.oldPrice = (this.selectedProduct as any).baseOldPrice ?? 0;
       this.selectedProduct.descuento = (this.selectedProduct as any).baseDescuento ?? 0;
     }
+  }
+
+  /** 🛒 Agregar producto al carrito */
+  addToCart(selectedProduct: any): void {
+    if (!this.selectedProduct) {
+      alert('Error: no hay producto seleccionado.');
+      return;
+    }
+
+    if (!this.selectedSize || !this.selectedVarianteId) {
+      alert('Por favor selecciona una talla antes de agregar al carrito.');
+      return;
+    }
+
+    const selectedSizeData = this.selectedProduct.sizes?.find(
+      (s: any) => s.talla === this.selectedSize
+    );
+
+    if (!selectedSizeData) {
+      alert('Error: talla no encontrada o sin información de stock.');
+      return;
+    }
+
+    const stockDisponible = selectedSizeData.stock ?? 0;
+    if (stockDisponible <= 0) {
+      alert('🚫 Este producto está agotado.');
+      return;
+    }
+
+    const currentCart = this.cartService.getCart();
+    const existing = currentCart.find(
+      (item: any) =>
+        item.id_variante === this.selectedVarianteId &&
+        item.talla === this.selectedSize
+    );
+
+    if (existing) {
+      if (existing.cantidad >= stockDisponible) {
+        alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+        return;
+      }
+      existing.cantidad++;
+      this.cartService.saveCart(currentCart);
+    } else {
+      const productToAdd = {
+        id_variante: this.selectedVarianteId,
+        name: this.selectedProduct.name,
+        talla: this.selectedSize,
+        image: this.activeImage,
+        precio_final: this.selectedProduct.price,
+        cantidad: 1,
+        stock: stockDisponible
+      };
+      this.cartService.addToCart(productToAdd);
+    }
+
+    alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+    this.closeModal();
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  // Métodos para favoritos
+  /** Agregar a favoritos */
+  addToFavorites(): void {
+    if (!this.selectedProduct) return;
+    if (!this.selectedSize || !this.selectedVarianteId) {
+      alert('Por favor selecciona una talla');
+      return;
+    }
+
+    this.favoritesService.addToFavorites({
+      id_variante: this.selectedVarianteId,
+      name: this.selectedProduct.name,
+      talla: this.selectedSize,
+      image: this.activeImage,
+      precio_final: this.selectedProduct.price
+    });
+    alert('✅ Producto agregado a favoritos');
+  }
+
+  /** Quitar de favoritos */
+  removeFromFavorites(): void {
+    if (this.selectedVarianteId) {
+      this.favoritesService.removeFromFavorites(this.selectedVarianteId, this.selectedSize);
+      alert('✅ Producto removido de favoritos');
+    }
+  }
+
+  /** Verificar si está en favoritos */
+  isInFavorites(): boolean {
+    return this.selectedVarianteId ?
+      this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize) : false;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

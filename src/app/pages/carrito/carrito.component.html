@@ -1,1 +1,86 @@
-<p>carrito en proceso hola!</p>
+<section class="cart-section" *ngIf="!success; else successMsg">
+  <h2>🛒 Tu Carrito de Compras</h2>
+
+  <div class="cart-container" *ngIf="cartItems.length > 0; else emptyCart">
+    <!-- 🧺 Lista de productos -->
+    <div class="cart-items">
+      <div class="cart-item" *ngFor="let item of cartItems">
+        <img [src]="item.image" [alt]="item.name" class="item-image" />
+
+        <div class="item-info">
+          <h3>{{ item.name }}</h3>
+          <p>Talla: {{ item.talla || 'Única' }}</p>
+
+          <!-- Mostrar precios con descuento si aplica -->
+          <p class="price">
+            <span *ngIf="item.descuento && item.descuento > 0" class="old">Q{{ item.oldPrice }}</span>
+            <span class="discounted">Q{{ item.precio_final }}</span>
+            <span *ngIf="item.descuento && item.descuento > 0" class="discount-badge">-{{ item.descuento }}%</span>
+          </p>
+        </div>
+
+        <div class="item-controls">
+          <button (click)="disminuir(item)">−</button>
+          <span>{{ item.cantidad }}</span>
+          <button (click)="aumentar(item)">+</button>
+        </div>
+
+        <div class="item-total">
+          Q{{ item.cantidad * item.precio_final | number:'1.2-2' }}
+        </div>
+
+        <button class="delete-btn" (click)="eliminar(item)">🗑</button>
+      </div>
+
+      <!-- 🔹 Botones inferiores -->
+      <div class="cart-actions">
+        <button class="continue-btn" (click)="continuarComprando()">← Continuar comprando</button>
+        <button class="clear-cart" (click)="vaciarCarrito()">Vaciar carrito</button>
+        <!-- 💳 Continuar con el pago -->
+        <button class="pay-now-btn" (click)="crearVentaYInitStripe()" [disabled]="loading">Continuar con el pago</button>
+      </div>
+    </div>
+
+    <!-- 💳 Resumen + Cliente -->
+    <div class="checkout-box">
+      <h3>Resumen del Pedido</h3>
+      <p class="total">Total: <strong>Q{{ total | number:'1.2-2' }}</strong></p>
+
+      <form class="cliente-form">
+        <h4>Datos del Cliente</h4>
+        <input type="text" placeholder="Nombre completo" [(ngModel)]="cliente.nombre" name="nombre" required />
+        <input type="email" placeholder="Correo electrónico" [(ngModel)]="cliente.email" name="email" required />
+        <input type="text" placeholder="Teléfono" [(ngModel)]="cliente.telefono" name="telefono" />
+        <input type="text" placeholder="Dirección" [(ngModel)]="cliente.direccion" name="direccion" />
+        <input type="text" placeholder="NIT (opcional)" [(ngModel)]="cliente.nit" name="nit" />
+      </form>
+
+      <!-- Stripe Separate Elements for Vertical Layout -->
+      <div class="stripe-container" *ngIf="clientSecret">
+        <h4>Información de Pago</h4>
+        <div #cardElement id="card-element" class="stripe-element"></div>
+        <div id="card-errors" role="alert"></div>
+        <button class="pay-button" (click)="finalizarCompra()" [disabled]="loading">
+          {{ loading ? 'Procesando...' : 'Pagar ahora' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 🧾 Compra exitosa -->
+<ng-template #successMsg>
+  <div class="success-message">
+    <h2>✅ ¡Gracias por tu compra!</h2>
+    <p>Tu pedido ha sido procesado correctamente.</p>
+    <button class="continue-btn" (click)="continuarComprando()">Seguir comprando</button>
+  </div>
+</ng-template>
+
+<!-- 🛍️ Carrito vacío -->
+<ng-template #emptyCart>
+  <div class="empty-cart">
+    <p>Tu carrito está vacío 🛍️</p>
+    <button class="continue-btn" (click)="continuarComprando()">Volver a comprar</button>
+  </div>
+</ng-template>

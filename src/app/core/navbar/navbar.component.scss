@@ -25,6 +25,30 @@
   text-align: center;
   gap: 0.15rem; /* 👈 menor separación entre logo y menú */
   padding: 0;
+  position: relative; /* permite posicionar elementos absolutos dentro */
+}
+
+/* SECCIÓN USUARIO IZQUIERDA */
+.user-section-left {
+  position: absolute;
+  left: 1.25rem; /* separado del borde izquierdo */
+  top: 0.6rem; /* alinear verticalmente con los iconos de la derecha */
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+
+  button {
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .greeting {
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
 }
 
 /* LOGO CENTRADO */
