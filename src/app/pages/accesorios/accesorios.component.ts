@@ -263,6 +263,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
         talla: this.selectedSize,
         image: this.activeImage,
         precio_final: this.selectedProduct.price,
+        oldPrice: this.selectedProduct.oldPrice,
+        descuento: this.selectedProduct.descuento,
         cantidad: 1,
         stock: stockDisponible
       };

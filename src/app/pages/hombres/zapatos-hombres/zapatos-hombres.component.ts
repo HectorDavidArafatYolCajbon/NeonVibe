@@ -49,13 +49,16 @@ export class ZapatosHombresComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.productosService.getVariantes().subscribe({
       next: (data) => {
-        // 🔹 Filtrar productos tipo zapatillas o tenis
+        // 🔹 Filtrar productos tipo zapatillas o tenis para hombres
         const zapatos = data.filter(
-          (v: any) =>
-            v.producto?.nombre?.toLowerCase().includes('zapatilla') ||
-            v.producto?.nombre?.toLowerCase().includes('tenis') ||
-            v.modelo?.toLowerCase().includes('zapatilla') ||
-            v.modelo?.toLowerCase().includes('tenis')
+          (v: any) => {
+            const name = v.producto?.nombre?.toLowerCase() || '';
+            const model = v.modelo?.toLowerCase() || '';
+            const isShoe = name.includes('zapatilla') || name.includes('tenis') || model.includes('zapatilla') || model.includes('tenis');
+            const isMen = name.includes('hombre') || name.includes('men') || model.includes('hombre') || model.includes('men');
+            const isNotWomen = !name.includes('mujer') && !name.includes('woman') && !model.includes('mujer') && !model.includes('woman');
+            return isShoe && isMen && isNotWomen;
+          }
         );
 
         // 🔹 Agrupar por producto
@@ -301,6 +304,8 @@ export class ZapatosHombresComponent implements OnInit, OnDestroy {
         talla: this.selectedSize,
         image: this.activeImage,
         precio_final: this.selectedProduct.price,
+        oldPrice: this.selectedProduct.oldPrice,
+        descuento: this.selectedProduct.descuento,
         cantidad: 1,
         stock: stockDisponible
       };

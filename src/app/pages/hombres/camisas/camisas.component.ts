@@ -244,6 +244,8 @@ selectSize(size: any) {
         talla: this.selectedSize,
         image: this.activeImage,
         precio_final: this.selectedProduct.price,
+        oldPrice: this.selectedProduct.oldPrice,
+        descuento: this.selectedProduct.descuento,
         cantidad: 1,
         stock: stockDisponible
       };
@@ -267,6 +269,11 @@ selectSize(size: any) {
 
   /** Agregar a favoritos */
   addToFavorites(): void {
+    if (!this.isLoggedIn) {
+      alert('Debes iniciar sesión para agregar productos a favoritos.');
+      return;
+    }
+
     if (!this.selectedProduct) return;
     if (!this.selectedSize || !this.selectedVarianteId) {
       alert('Por favor selecciona una talla');

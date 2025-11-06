@@ -1,4 +1,6 @@
-// Variables
+// ==============================
+// 🎨 VARIABLES DE COLOR Y TEMA
+// ==============================
 $primary-color: #6a1b9a;
 $hover-color: #54277e;
 $error-color: #e53935;
@@ -12,7 +14,9 @@ $primary: $primary-color;
 $error: $error-color;
 $primary-dark: $hover-color;
 
-// Mixins
+// ==============================
+// 🔧 MIXINS
+// ==============================
 @mixin button-base {
   border: none;
   border-radius: 8px;
@@ -28,7 +32,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Estilos base
+// ==============================
+// ⚙️ ESTRUCTURA GENERAL
+// ==============================
 :host {
   display: block;
   width: 100%;
@@ -46,7 +52,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Contenedor del carrito
+// ==============================
+// 🛒 CONTENEDOR PRINCIPAL
+// ==============================
 .cart-container {
   display: flex;
   justify-content: space-between;
@@ -56,7 +64,9 @@ $primary-dark: $hover-color;
   margin: 0 auto;
 }
 
-// Lista de items
+// ==============================
+// 🧺 LISTA DE PRODUCTOS
+// ==============================
 .cart-items {
   flex: 1;
   min-width: 300px;
@@ -64,7 +74,7 @@ $primary-dark: $hover-color;
 
 .cart-item {
   display: grid;
-  grid-template-columns: 80px 1fr auto auto;
+  grid-template-columns: 80px 1fr auto auto auto;
   gap: 1rem;
   align-items: center;
   padding: 1rem;
@@ -76,6 +86,21 @@ $primary-dark: $hover-color;
   &:hover {
     box-shadow: 0 4px 10px $shadow-color;
   }
+
+  > .delete-btn {
+    justify-self: center;
+    align-self: center;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      color: $error-color;
+    }
+  }
 }
 
 .item-image {
@@ -85,6 +110,9 @@ $primary-dark: $hover-color;
   border-radius: 4px;
 }
 
+// ==============================
+// 🧾 INFORMACIÓN DEL PRODUCTO
+// ==============================
 .item-info {
   text-align: left;
 
@@ -100,37 +128,92 @@ $primary-dark: $hover-color;
     margin: 2px 0;
     font-size: 0.9rem;
   }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+
+    .price {
+      flex: 1;
+      margin: 0;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: $error-color;
+      }
+    }
+  }
 }
 
-// Precio y descuentos
-.price {
+// ==============================
+// 💰 PRECIO Y DESCUENTOS
+// ==============================
+.price-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  font-weight: 700;
+  margin-top: 0.5rem;
 
-  .old {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 0.9rem;
-  }
-
-  .discounted {
-    color: $primary-color;
+  .price {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-weight: 700;
+    margin: 0;
+
+    .old {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+
+    .discounted {
+      color: $primary-color;
+      font-weight: 700;
+    }
+
+    .discount-badge {
+      background: $error-color;
+      color: white;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 1rem;
+
+    &:hover {
+      color: $error-color;
+    }
   }
 }
 
-.discount-badge {
-  background: $error-color;
-  color: white;
-  font-size: 0.8rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-// Controles de cantidad
+// ==============================
+// ➕➖ CONTROLES DE CANTIDAD
+// ==============================
 .item-controls {
   display: flex;
   align-items: center;
@@ -162,7 +245,9 @@ $primary-dark: $hover-color;
   color: $primary-color;
 }
 
-// Botón eliminar
+// ==============================
+// ❌ BOTONES DE ACCIONES
+// ==============================
 .delete-btn {
   border: none;
   background: none;
@@ -177,11 +262,12 @@ $primary-dark: $hover-color;
   }
 }
 
-// Acciones del carrito
 .cart-actions {
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 
   button {
     padding: 0.75rem 1.5rem;
@@ -203,7 +289,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Caja de checkout
+// ==============================
+// 💳 CAJA DE CHECKOUT
+// ==============================
 .checkout-box {
   width: 350px;
   padding: 1.5rem;
@@ -224,7 +312,9 @@ $primary-dark: $hover-color;
   margin: 1rem 0;
 }
 
-// Formulario de cliente
+// ==============================
+// 👤 FORMULARIO DE CLIENTE
+// ==============================
 .cliente-form {
   display: flex;
   flex-direction: column;
@@ -245,7 +335,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Stripe Elements
+// ==============================
+// 💳 STRIPE ELEMENTS
+// ==============================
 .stripe-container {
   margin-top: 1rem;
 }
@@ -259,7 +351,6 @@ $primary-dark: $hover-color;
   height: 60px;
   position: relative;
 
-  // Stripe specific styles
   .StripeElement {
     padding: 12px 15px !important;
     height: 100% !important;
@@ -275,7 +366,6 @@ $primary-dark: $hover-color;
     }
   }
 
-  // Ensure iframe is fully visible
   iframe {
     width: 100% !important;
     height: 100% !important;
@@ -314,7 +404,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Mensajes de estado
+// ==============================
+// 💬 MENSAJES DE ESTADO
+// ==============================
 .empty-cart,
 .success-message {
   text-align: center;
@@ -333,4 +425,66 @@ $primary-dark: $hover-color;
     padding: 10px 20px;
     @include hover-transform;
   }
+}
+
+// ==============================
+// 💜 ESTILOS DEL MODAL NEONVIBE
+// ==============================
+.neon-popup {
+  box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+  border-radius: 20px !important;
+  font-family: 'Poppins', sans-serif;
+  animation: neonFadeIn 0.5s ease-out;
+}
+
+@keyframes neonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.swal2-title {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.swal2-icon.swal2-info {
+  border-color: #fff !important;
+  color: #fff !important;
+}
+
+.neon-confirm-btn {
+  background: linear-gradient(90deg, #8c2eff, #6a1b9a) !important;
+  color: #fff !important;
+  border-radius: 25px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  padding: 10px 30px !important;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+  transition: all 0.3s ease;
+}
+
+.neon-confirm-btn:hover {
+  background: linear-gradient(90deg, #6a1b9a, #8c2eff) !important;
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.7);
+}
+
+.neon-cancel-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border-radius: 25px !important;
+  font-weight: 500 !important;
+  padding: 10px 30px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+.neon-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
 }
