@@ -417,3 +417,15 @@
   25% { color: #d32f2f; transform: scale(1.15); }
   100% { color: #c850c0; transform: scale(1); }
 }
+
+.neon-toast-dark {
+  border-radius: 14px !important;
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(200, 80, 192, 0.4),
+              0 0 6px rgba(255, 255, 255, 0.1);
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border: 1px solid rgba(200, 80, 192, 0.5);
+}

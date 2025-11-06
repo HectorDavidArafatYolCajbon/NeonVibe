@@ -6,6 +6,7 @@ import { ProductosService } from 'src/app/services/productos.service';
 import { CartService } from 'src/app/services/cart.service';
 import { FavoritesService } from 'src/app/services/favorites.service';
 import { Product } from 'src/app/models/product';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-blusas',
@@ -42,12 +43,11 @@ export class BlusasComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** 🩵 Cargar productos tipo blusa */
+  /** 🩷 Cargar productos tipo blusa */
   cargarBlusas(): void {
     this.loading = true;
     this.productosService.getVariantes().subscribe({
       next: (data) => {
-        // 🔹 Filtrar solo productos tipo blusa
         const blusas = data.filter(
           (v: any) =>
             v.producto?.nombre?.toLowerCase().includes('blusa') ||
@@ -58,13 +58,12 @@ export class BlusasComponent implements OnInit, OnDestroy {
 
         for (const v of blusas) {
           const idProducto = v.producto?.id_producto;
+          if (!idProducto) continue;
 
-          // ⛔️ Omitir variantes sin imágenes válidas
           const tieneImagen =
             (v.imagen_url && !v.imagen_url.includes('Sin+Imagen')) ||
             (Array.isArray(v.imagenes) &&
               v.imagenes.some((img: any) => img?.url && !img.url.includes('Sin+Imagen')));
-
           if (!tieneImagen) continue;
 
           if (!agrupadas[idProducto]) {
@@ -72,11 +71,7 @@ export class BlusasComponent implements OnInit, OnDestroy {
               id: idProducto,
               name: v.producto?.nombre || v.modelo,
               description: v.producto?.descripcion || 'Sin descripción disponible',
-              color: v.color,
-              image:
-                v.imagen_url ||
-                v.imagenes?.[0]?.url ||
-                'https://via.placeholder.com/400x400?text=Sin+Imagen',
+              image: v.imagen_url || v.imagenes?.[0]?.url,
               images: [],
               sizes: [],
               descuentos: [],
@@ -84,11 +79,10 @@ export class BlusasComponent implements OnInit, OnDestroy {
             };
           }
 
-          // Combinar imágenes válidas
-          const nuevasImgs: string[] = [];
-          if (v.imagen_url) nuevasImgs.push(v.imagen_url);
-          if (Array.isArray(v.imagenes))
-            nuevasImgs.push(...v.imagenes.filter((i: any) => i?.url).map((i: any) => i.url));
+          const nuevasImgs = [
+            v.imagen_url,
+            ...(v.imagenes?.map((i: any) => i.url) || [])
+          ].filter(Boolean);
 
           agrupadas[idProducto].images = [
             ...new Set([...(agrupadas[idProducto].images || []), ...nuevasImgs])
@@ -105,21 +99,18 @@ export class BlusasComponent implements OnInit, OnDestroy {
           agrupadas[idProducto].precios.push(parseFloat(v.precio_final ?? v.precio_venta ?? 0));
         }
 
-        this.products = Object.values(agrupadas)
-          .map((p: any) => {
-            const maxPrecio = Math.max(...p.precios);
-            const maxDesc = Math.max(...p.descuentos);
-            const minPrecio = Math.min(...p.precios);
-
-            return {
-              ...p,
-              descuento: maxDesc > 0 ? maxDesc : 0,
-              price: minPrecio,
-              oldPrice: maxDesc > 0 ? maxPrecio : minPrecio,
-              tieneRango: maxPrecio !== minPrecio
-            };
-          })
-          .filter((p: any) => Array.isArray(p.images) && p.images.length > 0);
+        this.products = Object.values(agrupadas).map((p: any) => {
+          const maxPrecio = Math.max(...p.precios);
+          const maxDesc = Math.max(...p.descuentos);
+          const minPrecio = Math.min(...p.precios);
+          return {
+            ...p,
+            descuento: maxDesc > 0 ? maxDesc : 0,
+            price: minPrecio,
+            oldPrice: maxDesc > 0 ? maxPrecio : minPrecio,
+            tieneRango: maxPrecio !== minPrecio
+          };
+        });
 
         this.loading = false;
       },
@@ -136,7 +127,6 @@ export class BlusasComponent implements OnInit, OnDestroy {
     this.selectedSize = '';
     this.selectedVarianteId = null;
     this.modalVisible = true;
-
     (this.selectedProduct as any).basePrice = product.price;
     (this.selectedProduct as any).baseOldPrice = product.oldPrice;
     (this.selectedProduct as any).baseDescuento = product.descuento;
@@ -148,7 +138,6 @@ export class BlusasComponent implements OnInit, OnDestroy {
     this.selectedProduct = null;
     this.selectedSize = '';
     this.selectedVarianteId = null;
-    this.currentVariante = null;
   }
 
   nextImage() {
@@ -170,92 +159,45 @@ export class BlusasComponent implements OnInit, OnDestroy {
   selectSize(size: any) {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
-
-    const basePrice = (this.selectedProduct as any).basePrice ?? 0;
-    const baseOld = (this.selectedProduct as any).baseOldPrice ?? 0;
-    const baseDesc = (this.selectedProduct as any).baseDescuento ?? 0;
-
     const variante = (this.productosService.cachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
         (v.talla || 'Única') === size.talla
     );
-
     if (variante) {
       this.selectedVarianteId = variante.id_variante;
-      this.currentVariante = variante;
-
-      const pv = parseFloat(variante.precio_venta ?? baseOld);
-      const desc = parseFloat(variante.descuento ?? baseDesc);
-      let pf = parseFloat(variante.precio_final ?? '0');
-
-      // Si no tiene descuento o descuento 0, mostrar solo el precio normal
-      if (!desc || desc <= 0) {
-        this.selectedProduct.price = pv;
-        this.selectedProduct.oldPrice = 0; // ← no mostrar
-        this.selectedProduct.descuento = 0;
-      } else {
-        // Si tiene descuento, calcular precio final si no viene
-        if (!pf || pf === pv) {
-          pf = parseFloat((pv * (1 - desc / 100)).toFixed(2));
-        }
-        this.selectedProduct.price = pf; // rojo (con descuento)
-        this.selectedProduct.oldPrice = pv; // gris tachado
-        this.selectedProduct.descuento = desc;
-      }
-
-      // Mantener imágenes
-      this.selectedProduct.images = (this.selectedProduct as any).baseImages || [];
-      this.activeImage = this.selectedProduct.images?.[0] ||
-        'https://via.placeholder.com/400x400?text=Sin+Imagen';
-
-      // 🔔 Animación visual del precio
+      this.selectedProduct.price = parseFloat(
+        variante.precio_final ?? variante.precio_venta ?? (this.selectedProduct as any).basePrice
+      );
+      this.selectedProduct.oldPrice = parseFloat(
+        variante.precio_venta ?? (this.selectedProduct as any).baseOldPrice
+      );
+      this.selectedProduct.descuento = parseFloat(variante.descuento ?? 0);
       const priceEl = document.querySelector('.modal-details .price') as HTMLElement;
       if (priceEl) {
         priceEl.classList.remove('price-change');
         void priceEl.offsetWidth;
         priceEl.classList.add('price-change');
       }
-    } else {
-      // Restaurar base
-      this.selectedProduct.price = basePrice;
-      this.selectedProduct.oldPrice = baseOld;
-      this.selectedProduct.descuento = baseDesc;
-      this.selectedVarianteId = null;
-      this.currentVariante = null;
     }
   }
 
-  // 🛒 Agregar al carrito
+  /** 🛍️ Agregar al carrito */
   addToCart(): void {
-    // 🧩 Validar que el producto y talla estén definidos
-    if (!this.selectedProduct) {
-      alert('Error: no hay producto seleccionado.');
-      return;
-    }
-
+    if (!this.selectedProduct) return;
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla antes de agregar al carrito.');
+      this.toastModal('Selecciona una talla antes de agregar al carrito', 'warning');
       return;
     }
 
-    // 🧩 Validar que el arreglo sizes exista antes de buscar
     const selectedSizeData = this.selectedProduct.sizes?.find(
       (s: any) => s.talla === this.selectedSize
     );
-
-    if (!selectedSizeData) {
-      alert('Error: talla no encontrada o sin información de stock.');
+    if (!selectedSizeData || selectedSizeData.stock <= 0) {
+      this.toastModal('🚫 Este producto está agotado', 'error');
       return;
     }
 
-    const stockDisponible = selectedSizeData.stock ?? 0;
-    if (stockDisponible <= 0) {
-      alert('🚫 Este producto está agotado.');
-      return;
-    }
-
-    // 🧩 Obtener carrito actual
     const currentCart = this.cartService.getCart();
     const existing = currentCart.find(
       (item: any) =>
@@ -264,8 +206,8 @@ export class BlusasComponent implements OnInit, OnDestroy {
     );
 
     if (existing) {
-      if (existing.cantidad >= stockDisponible) {
-        alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+      if (existing.cantidad >= selectedSizeData.stock) {
+        this.toastModal(`Solo hay ${selectedSizeData.stock} unidades disponibles`, 'warning');
         return;
       }
       existing.cantidad++;
@@ -280,55 +222,70 @@ export class BlusasComponent implements OnInit, OnDestroy {
         oldPrice: this.selectedProduct.oldPrice,
         descuento: this.selectedProduct.descuento,
         cantidad: 1,
-        stock: stockDisponible
+        stock: selectedSizeData.stock
       };
       this.cartService.addToCart(productToAdd);
     }
 
-    alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+    this.toastModal(`${this.selectedProduct.name} Agregar al Carrito 🛍️`, 'success');
     this.closeModal();
   }
 
-  ngOnDestroy(): void {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
-
-  /** Agregar a favoritos */
+  /** ❤️ Agregar a favoritos */
   addToFavorites(): void {
-    if (!this.selectedProduct) return;
+    if (!this.isLoggedIn) {
+      this.toastModal('Debes iniciar sesión para agregar a favoritos', 'info');
+      return;
+    }
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla');
+      this.closeModal();
+      this.toastModal('Selecciona una talla antes de agregar a favoritos', 'warning');
       return;
     }
 
     this.favoritesService.addToFavorites({
       id_variante: this.selectedVarianteId,
-      name: this.selectedProduct.name,
+      name: this.selectedProduct?.name,
       talla: this.selectedSize,
       image: this.activeImage,
-      precio_final: this.selectedProduct.price
+      precio_final: this.selectedProduct?.price
     });
-    alert('✅ Producto agregado a favoritos');
+
+    this.toastModal('Agregado a tus favoritos 💗', 'success');
+    this.closeModal();
   }
 
-  /** Quitar de favoritos */
+  /** 💔 Quitar de favoritos */
   removeFromFavorites(): void {
     if (this.selectedVarianteId) {
       this.favoritesService.removeFromFavorites(this.selectedVarianteId, this.selectedSize);
-      alert('✅ Producto removido de favoritos');
+      this.toastModal('Eliminado de favoritos 💔', 'info');
+      this.closeModal();
     }
   }
 
-  /** Verificar si está en favoritos */
   isInFavorites(): boolean {
-    return this.selectedVarianteId ?
-      this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize) : false;
+    if (!this.selectedVarianteId) return false;
+    return this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize);
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) this.userSubscription.unsubscribe();
+  }
+
+  /** 🌑 Toast oscuro NeonVibe */
+  private toastModal(title: string, icon: 'success' | 'error' | 'info' | 'warning') {
+    Swal.fire({
+      icon,
+      title,
+      position: 'top',
+      toast: true,
+      background: '#000',
+      color: '#fff',
+      showConfirmButton: false,
+      timer: 1900,
+      backdrop: false,
+      customClass: { popup: 'neon-toast-dark' }
+    });
   }
 }
