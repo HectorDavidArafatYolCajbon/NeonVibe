@@ -1,0 +1,336 @@
+// Variables
+$primary-color: #6a1b9a;
+$hover-color: #54277e;
+$error-color: #e53935;
+$text-dark: #222;
+$text-light: #666;
+$border-color: #eee;
+$shadow-color: rgba(106, 27, 154, 0.15);
+
+// Aliases for compatibility
+$primary: $primary-color;
+$error: $error-color;
+$primary-dark: $hover-color;
+
+// Mixins
+@mixin button-base {
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+@mixin hover-transform {
+  &:hover {
+    background: $hover-color;
+    transform: translateY(-2px);
+  }
+}
+
+// Estilos base
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cart-section {
+  padding: 2rem;
+  text-align: center;
+  background: #fff;
+
+  h2 {
+    color: $primary-color;
+    font-weight: 800;
+    margin-bottom: 2rem;
+  }
+}
+
+// Contenedor del carrito
+.cart-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Lista de items
+.cart-items {
+  flex: 1;
+  min-width: 300px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 10px $shadow-color;
+  }
+}
+
+.item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.item-info {
+  text-align: left;
+
+  h3 {
+    margin: 0;
+    color: $text-dark;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  p {
+    color: $text-light;
+    margin: 2px 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Precio y descuentos
+.price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+
+  .old {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+  }
+
+  .discounted {
+    color: $primary-color;
+    font-weight: 700;
+  }
+}
+
+.discount-badge {
+  background: $error-color;
+  color: white;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+// Controles de cantidad
+.item-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  button {
+    width: 30px;
+    height: 30px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+  }
+
+  span {
+    font-weight: 600;
+  }
+}
+
+.item-total {
+  font-weight: 700;
+  color: $primary-color;
+}
+
+// Botón eliminar
+.delete-btn {
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #999;
+  transition: 0.2s;
+
+  &:hover {
+    color: $error-color;
+    transform: scale(1.1);
+  }
+}
+
+// Acciones del carrito
+.cart-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    padding: 0.75rem 1.5rem;
+    @include button-base;
+    background: $primary-color;
+    color: white;
+    @include hover-transform;
+
+    &.clear-cart {
+      background: transparent;
+      border: 1px solid $error-color;
+      color: $error-color;
+
+      &:hover {
+        background: $error-color;
+        color: white;
+      }
+    }
+  }
+}
+
+// Caja de checkout
+.checkout-box {
+  width: 350px;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+  h3, h4 {
+    margin-bottom: 1rem;
+    color: $text-dark;
+  }
+}
+
+.total {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: $primary-color;
+  margin: 1rem 0;
+}
+
+// Formulario de cliente
+.cliente-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: 0.2s ease;
+
+    &:focus {
+      border-color: $primary-color;
+      outline: none;
+      box-shadow: 0 0 4px rgba($primary-color, 0.3);
+    }
+  }
+}
+
+// Stripe Elements
+.stripe-container {
+  margin-top: 1rem;
+}
+
+.stripe-element {
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 1rem;
+  height: 60px;
+  position: relative;
+
+  // Stripe specific styles
+  .StripeElement {
+    padding: 12px 15px !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+
+    input {
+      border: none !important;
+      outline: none !important;
+      font-size: 16px !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+
+  // Ensure iframe is fully visible
+  iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    display: block !important;
+    visibility: visible !important;
+    z-index: 1 !important;
+  }
+
+  &--focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 4px rgba($primary-color, 0.3);
+  }
+}
+
+#card-errors {
+  color: $error-color;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.pay-button {
+  width: 100%;
+  padding: 1rem;
+  @include button-base;
+  background: $primary-color;
+  color: white;
+
+  &:hover {
+    background: $hover-color;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+// Mensajes de estado
+.empty-cart,
+.success-message {
+  text-align: center;
+  padding: 2rem;
+
+  p {
+    color: $text-light;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+  }
+
+  button {
+    @include button-base;
+    background: $primary-color;
+    color: white;
+    padding: 10px 20px;
+    @include hover-transform;
+  }
+}

@@ -1,5 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
+import { CartService } from 'src/app/services/cart.service';
+import { FavoritesService } from 'src/app/services/favorites.service';
 import { Product } from 'src/app/models/product';
 
 @Component({
@@ -7,17 +12,34 @@ import { Product } from 'src/app/models/product';
   templateUrl: './vestidos.component.html',
   styleUrls: ['./vestidos.component.scss']
 })
-export class VestidosComponent implements OnInit {
+export class VestidosComponent implements OnInit, OnDestroy {
+  isLoggedIn = false;
+  currentUser: any = null;
+  private userSubscription!: Subscription;
   products: Product[] = [];
   selectedProduct: Product | null = null;
   activeImage: string = '';
   selectedSize: string = '';
+  selectedVarianteId: number | null = null;
+  currentVariante: any = null;
   loading = true;
+  modalVisible = false;
 
-  constructor(private productosService: ProductosService) {}
+  constructor(
+    private productosService: ProductosService,
+    private authService: AuthService,
+    private router: Router,
+    private cartService: CartService,
+    private favoritesService: FavoritesService
+  ) {}
 
   ngOnInit(): void {
     this.cargarFaldasVestidos();
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.userSubscription = this.authService.currentUser.subscribe(user => {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    });
   }
 
   /** 🟣 Cargar faldas y vestidos agrupando variantes por producto/color */
@@ -133,18 +155,25 @@ export class VestidosComponent implements OnInit {
   // 🔹 Abrir modal
   openModal(product: Product) {
     this.selectedProduct = { ...product };
-    this.activeImage = product.images?.[0] || '';
+    this.activeImage = product.images?.[0] || product.image || 'https://via.placeholder.com/400x400?text=Sin+Imagen';
     this.selectedSize = '';
+    this.selectedVarianteId = null;
+    this.modalVisible = true;
 
     // Guardar precios base
-    this.selectedProduct.basePrice = product.price;
-    this.selectedProduct.baseOldPrice = product.oldPrice;
-    this.selectedProduct.baseDescuento = product.descuento;
+    (this.selectedProduct as any).basePrice = product.price;
+    (this.selectedProduct as any).baseOldPrice = product.oldPrice;
+    (this.selectedProduct as any).baseDescuento = product.descuento;
+    (this.selectedProduct as any).baseImages = [...(product.images || [])];
   }
 
   // 🔹 Cerrar modal
   closeModal() {
+    this.modalVisible = false;
     this.selectedProduct = null;
+    this.selectedSize = '';
+    this.selectedVarianteId = null;
+    this.currentVariante = null;
   }
 
   // 🔹 Navegar entre imágenes
@@ -170,64 +199,162 @@ export class VestidosComponent implements OnInit {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
 
+    const basePrice = (this.selectedProduct as any).basePrice ?? 0;
+    const baseOld = (this.selectedProduct as any).baseOldPrice ?? 0;
+    const baseDesc = (this.selectedProduct as any).baseDescuento ?? 0;
+
     const variante = (this.productosService.cachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
-        v.talla === size.talla
+        (v.talla || 'Única') === size.talla
     );
 
     if (variante) {
-      this.selectedProduct.price = parseFloat(
-        variante.precio_final ??
-          variante.precio_venta ??
-          this.selectedProduct.basePrice
-      );
-      this.selectedProduct.oldPrice = parseFloat(
-        variante.precio_venta ?? this.selectedProduct.baseOldPrice
-      );
-      this.selectedProduct.descuento = parseFloat(variante.descuento ?? 0);
+      this.selectedVarianteId = variante.id_variante;
+      this.currentVariante = variante;
 
-      // 👇 Animación del precio
-      const priceEl = document.querySelector(
-        '.modal-details .price'
-      ) as HTMLElement;
+      const pv = parseFloat(variante.precio_venta ?? baseOld);
+      const desc = parseFloat(variante.descuento ?? baseDesc);
+      let pf = parseFloat(variante.precio_final ?? '0');
+
+      // Si no tiene descuento o descuento 0, mostrar solo el precio normal
+      if (!desc || desc <= 0) {
+        this.selectedProduct.price = pv;
+        this.selectedProduct.oldPrice = 0; // ← no mostrar
+        this.selectedProduct.descuento = 0;
+      } else {
+        // Si tiene descuento, calcular precio final si no viene
+        if (!pf || pf === pv) {
+          pf = parseFloat((pv * (1 - desc / 100)).toFixed(2));
+        }
+        this.selectedProduct.price = pf; // rojo (con descuento)
+        this.selectedProduct.oldPrice = pv; // gris tachado
+        this.selectedProduct.descuento = desc;
+      }
+
+      // Mantener imágenes
+      this.selectedProduct.images = (this.selectedProduct as any).baseImages || [];
+      this.activeImage = this.selectedProduct.images?.[0] ||
+        'https://via.placeholder.com/400x400?text=Sin+Imagen';
+
+      // 🔔 Animación visual del precio
+      const priceEl = document.querySelector('.modal-details .price') as HTMLElement;
       if (priceEl) {
         priceEl.classList.remove('price-change');
         void priceEl.offsetWidth;
         priceEl.classList.add('price-change');
       }
-
-      // 👗 Mostrar TODAS las imágenes (variante + producto base)
-      const imgsVariante: string[] = [];
-
-      if (variante.imagen_url && !variante.imagen_url.includes('Sin+Imagen'))
-        imgsVariante.push(variante.imagen_url);
-
-      if (Array.isArray(variante.imagenes) && variante.imagenes.length > 0) {
-        for (const imgObj of variante.imagenes) {
-          if (imgObj?.url && !imgObj.url.includes('Sin+Imagen')) {
-            imgsVariante.push(imgObj.url);
-          }
-        }
-      }
-
-      // 🔸 Fusionar imágenes de la talla con las del producto
-      const todasImgs = [
-        ...new Set([
-          ...(this.selectedProduct.images || []),
-          ...imgsVariante.filter(Boolean)
-        ])
-      ];
-
-      if (todasImgs.length > 0) {
-        this.selectedProduct.images = todasImgs;
-        this.activeImage = todasImgs[0];
-      }
     } else {
-      // Restaurar valores base
-      this.selectedProduct.price = this.selectedProduct.basePrice;
-      this.selectedProduct.oldPrice = this.selectedProduct.baseOldPrice;
-      this.selectedProduct.descuento = this.selectedProduct.baseDescuento;
+      // Restaurar base
+      this.selectedProduct.price = basePrice;
+      this.selectedProduct.oldPrice = baseOld;
+      this.selectedProduct.descuento = baseDesc;
+      this.selectedVarianteId = null;
+      this.currentVariante = null;
     }
+  }
+
+  // 🛒 Agregar al carrito
+  addToCart(): void {
+    // 🧩 Validar que el producto y talla estén definidos
+    if (!this.selectedProduct) {
+      alert('Error: no hay producto seleccionado.');
+      return;
+    }
+
+    if (!this.selectedSize || !this.selectedVarianteId) {
+      alert('Por favor selecciona una talla antes de agregar al carrito.');
+      return;
+    }
+
+    // 🧩 Validar que el arreglo sizes exista antes de buscar
+    const selectedSizeData = this.selectedProduct.sizes?.find(
+      (s: any) => s.talla === this.selectedSize
+    );
+
+    if (!selectedSizeData) {
+      alert('Error: talla no encontrada o sin información de stock.');
+      return;
+    }
+
+    const stockDisponible = selectedSizeData.stock ?? 0;
+    if (stockDisponible <= 0) {
+      alert('🚫 Este producto está agotado.');
+      return;
+    }
+
+    // 🧩 Obtener carrito actual
+    const currentCart = this.cartService.getCart();
+    const existing = currentCart.find(
+      (item: any) =>
+        item.id_variante === this.selectedVarianteId &&
+        item.talla === this.selectedSize
+    );
+
+    if (existing) {
+      if (existing.cantidad >= stockDisponible) {
+        alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+        return;
+      }
+      existing.cantidad++;
+      this.cartService.saveCart(currentCart);
+    } else {
+      const productToAdd = {
+        id_variante: this.selectedVarianteId,
+        name: this.selectedProduct.name,
+        talla: this.selectedSize,
+        image: this.activeImage,
+        precio_final: this.selectedProduct.price,
+        cantidad: 1,
+        stock: stockDisponible
+      };
+      this.cartService.addToCart(productToAdd);
+    }
+
+    alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+    this.closeModal();
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
+
+  /** Agregar a favoritos */
+  addToFavorites(): void {
+    if (!this.selectedProduct) return;
+    if (!this.selectedSize || !this.selectedVarianteId) {
+      alert('Por favor selecciona una talla');
+      return;
+    }
+
+    this.favoritesService.addToFavorites({
+      id_variante: this.selectedVarianteId,
+      name: this.selectedProduct.name,
+      talla: this.selectedSize,
+      image: this.activeImage,
+      precio_final: this.selectedProduct.price
+    });
+    alert('✅ Producto agregado a favoritos');
+  }
+
+  /** Quitar de favoritos */
+  removeFromFavorites(): void {
+    if (this.selectedVarianteId) {
+      this.favoritesService.removeFromFavorites(this.selectedVarianteId, this.selectedSize);
+      alert('✅ Producto removido de favoritos');
+    }
+  }
+
+  /** Verificar si está en favoritos */
+  isInFavorites(): boolean {
+    return this.selectedVarianteId ?
+      this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize) : false;
   }
 }

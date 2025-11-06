@@ -30,3 +30,32 @@
     </div>
   </div>
 </section>
+
+<!-- 🔹 Sección: Productos Destacados -->
+<section class="featured-products">
+  <h2>Productos Destacados</h2>
+
+  <div class="featured-grid">
+    <div class="featured-card" *ngFor="let f of featured">
+      <div class="img-wrap">
+        <img [src]="f.image" [alt]="f.name" />
+      </div>
+      <div class="info">
+        <h4>{{ f.name }}</h4>
+        <p class="price">Q{{ f.precio_final }}</p>
+        <div class="size-select">
+          <label>Talla:</label>
+          <ng-container *ngIf="f.sizes && f.sizes.length; else unica">
+            <select [(ngModel)]="f.selectedSize">
+              <option *ngFor="let s of f.sizes" [value]="s">{{ s }}</option>
+            </select>
+          </ng-container>
+          <ng-template #unica>
+            <span class="single-size">{{ f.talla }}</span>
+          </ng-template>
+        </div>
+        <button class="add-btn" (click)="addFeaturedToCart(f)">Agregar al Carrito</button>
+      </div>
+    </div>
+  </div>
+</section>

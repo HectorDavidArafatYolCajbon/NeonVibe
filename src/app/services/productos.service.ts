@@ -27,4 +27,9 @@ export class ProductosService {
     return this.http.get<any[]>('https://proyectoropa-ijsq.onrender.com/api/productos');
   }
 
+  // Actualizar stock de una variante
+  updateVarianteStock(id_variante: number, cantidad: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id_variante}/stock`, { cantidad });
+  }
+
 }

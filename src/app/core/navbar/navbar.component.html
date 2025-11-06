@@ -1,5 +1,13 @@
 <mat-toolbar class="navbar" color="primary">
   <div class="navbar-content">
+    <!-- 🔹 Sección de usuario a la izquierda (solo cuando hay sesión) -->
+    <div class="user-section-left" *ngIf="isLoggedIn">
+      <button mat-icon-button aria-label="Logout" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+      <span class="greeting">Hola, {{ currentUser?.nombre }}!</span>
+    </div>
+
     <!-- 🔹 Logo -->
     <h1 class="logo" routerLink="/">NEONVIBE</h1>
 
@@ -42,9 +50,11 @@
         <mat-icon>favorite</mat-icon>
       </button>
 
-      <button mat-icon-button aria-label="Cuenta" routerLink="/login">
+      <!-- Mostrar icono de cuenta a la derecha solo si NO hay sesión -->
+      <button *ngIf="!isLoggedIn" mat-icon-button aria-label="Cuenta" routerLink="/login">
         <mat-icon>account_circle</mat-icon>
       </button>
+
     </div>
   </div>
 </mat-toolbar>

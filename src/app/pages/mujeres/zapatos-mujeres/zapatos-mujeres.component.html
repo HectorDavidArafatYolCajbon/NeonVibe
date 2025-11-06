@@ -110,14 +110,20 @@
           </div>
         </div>
 
-        <!-- 👜 Botón de agregar -->
-        <button
-          class="add-to-cart"
-          [disabled]="!selectedSize"
-          (click)="addToCart(selectedProduct)"
-        >
-          Agregar a la Bolsa
-        </button>
+        <!-- 👜 Botones de acciones -->
+        <div class="actions-container">
+          <button
+            class="add-to-cart"
+            [disabled]="!selectedSize"
+            (click)="addToCart()"
+          >
+            Agregar al Carrito
+          </button>
+          <button mat-icon-button [color]="isInFavorites() ? 'warn' : ''"
+                  (click)="isInFavorites() ? removeFromFavorites() : addToFavorites()">
+            <mat-icon>{{isInFavorites() ? 'favorite' : 'favorite_border'}}</mat-icon>
+          </button>
+        </div>
 
         <div class="no-sizes" *ngIf="sizes.length === 0">
           <p>Sin tallas disponibles</p>
@@ -125,4 +131,11 @@
       </ng-container>
     </div>
   </div>
+</div>
+
+<!-- Botón de logout fijo en esquina superior izquierda -->
+<div class="logout-btn" *ngIf="isLoggedIn">
+  <button mat-icon-button (click)="logout()">
+    <mat-icon>logout</mat-icon>
+  </button>
 </div>

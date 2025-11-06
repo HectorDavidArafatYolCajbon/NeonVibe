@@ -1,1 +1,30 @@
-<p>favoritos works!</p>
+<div class="favorites-container">
+  <h2>Mis Favoritos</h2>
+
+  <div *ngIf="favorites.length === 0" class="empty-message">
+    <mat-icon>favorite_border</mat-icon>
+    <p>No tienes productos en favoritos</p>
+    <button mat-raised-button color="primary" routerLink="/home">Explorar productos</button>
+  </div>
+
+  <div *ngIf="favorites.length > 0" class="favorites-grid">
+    <div *ngFor="let item of favorites" class="favorite-card">
+      <div class="img-wrap">
+        <img [src]="item.image" [alt]="item.name">
+      </div>
+      <div class="content">
+        <h3>{{item.name}}</h3>
+        <p class="size">Talla: {{item.talla}}</p>
+        <p class="price">Q{{item.precio_final}}</p>
+        <div class="actions">
+          <button mat-raised-button color="primary" (click)="addToCart(item)">
+            Agregar al carrito 🛒
+          </button>
+          <button mat-icon-button color="warn" (click)="removeFromFavorites(item)">
+            <mat-icon>favorite</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

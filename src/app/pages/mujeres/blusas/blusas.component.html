@@ -102,9 +102,16 @@
         </div>
       </div>
 
-      <button class="add-to-cart" [disabled]="!selectedSize">
-        Agregar a la Bolsa
-      </button>
+      <div class="actions-container">
+        <button class="add-to-cart" [disabled]="!selectedSize" (click)="addToCart()">
+          Agregar al Carrito
+        </button>
+        <button mat-icon-button [color]="isInFavorites() ? 'warn' : ''"
+                (click)="isInFavorites() ? removeFromFavorites() : addToFavorites()">
+          <mat-icon>{{isInFavorites() ? 'favorite' : 'favorite_border'}}</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
 </div>
+

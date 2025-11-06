@@ -103,7 +103,12 @@
         </div>
       </div>
 
-      <button class="add-to-cart" [disabled]="!selectedSize">Agregar a la Bolsa</button>
+      <button class="add-to-cart"
+        [disabled]="!selectedSize"
+        (click)="addToCart()">
+  Agregar al Carrito
+</button>
+
     </div>
   </div>
 </div>
