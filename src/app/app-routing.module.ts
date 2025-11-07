@@ -11,10 +11,8 @@ import { MujeresComponent } from './pages/mujeres/mujeres.component';
 import { AccesoriosComponent } from './pages/accesorios/accesorios.component';
 import { OfertasComponent } from './pages/ofertas/ofertas.component';
 import { MarcasComponent } from './pages/marcas/marcas.component';
-
 import { CarritoComponent } from './pages/carrito/carrito.component';
 import { FavoritosComponent } from './pages/favoritos/favoritos.component';
-
 
 // 🔹 Sección Hombres
 import { CamisasComponent } from './pages/hombres/camisas/camisas.component';
@@ -26,8 +24,10 @@ import { VestidosComponent } from './pages/mujeres/vestidos/vestidos.component';
 import { BlusasComponent } from './pages/mujeres/blusas/blusas.component';
 import { ZapatosMujeresComponent } from './pages/mujeres/zapatos-mujeres/zapatos-mujeres.component';
 
-import { HttpClientModule } from '@angular/common/http';
-
+// 🔹 Admin
+import { AdminComponent } from './pages/admin/admin.component';
+import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component'; // 👈 agregado
+import { ProductosComponent } from './pages/admin/productos/productos.component';
 
 const routes: Routes = [
   // 🔹 Página de inicio
@@ -36,23 +36,22 @@ const routes: Routes = [
   // 🔹 Página de login
   { path: 'login', component: LoginComponent, title: 'Iniciar sesión' },
 
-    // 🔹 Rutas de íconos
+  // 🔹 Rutas de íconos
   { path: 'carrito', component: CarritoComponent, title: 'Carrito de compras' },
   { path: 'favoritos', component: FavoritosComponent, title: 'Favoritos' },
 
-
-  // 🔹 Rutas de categorías
+  // 🔹 Rutas de categorías principales
   { path: 'diseno-sport', component: DisenoSportComponent, title: 'Diseños Sport' },
   { path: 'accesorios-sport', component: AccesoriosSportComponent, title: 'Accesorios Sport' },
   { path: 'de-lo-nuevo-en-moda', component: DeLoNuevoEnModaComponent, title: 'De lo nuevo en moda' },
   { path: 'vistete-a-tu-estilo', component: VisteteATuEstiloComponent, title: 'Vístete a tu estilo' },
 
-    // 🔹 Nuevas rutas del navbar
+  // 🔹 Nuevas rutas del navbar
   { path: 'hombres', component: HombresComponent, title: 'Ropa para Hombres' },
   { path: 'mujeres', component: MujeresComponent, title: 'Ropa para Mujeres' },
   { path: 'accesorios', component: AccesoriosComponent, title: 'Accesorios' },
 
-    // 🔹 HOMBRES
+  // 🔹 HOMBRES
   { path: 'hombres/camisas', component: CamisasComponent, title: 'Camisas - Hombres' },
   { path: 'hombres/pantalones', component: PantalonesComponent, title: 'Pantalones - Hombres' },
   { path: 'hombres/zapatos', component: ZapatosHombresComponent, title: 'Zapatos - Hombres' },
@@ -62,19 +61,30 @@ const routes: Routes = [
   { path: 'mujeres/blusas', component: BlusasComponent, title: 'Blusas - Mujeres' },
   { path: 'mujeres/zapatos', component: ZapatosMujeresComponent, title: 'Zapatos - Mujeres' },
 
-
   { path: 'ofertas', component: OfertasComponent, title: 'Ofertas' },
   { path: 'marcas', component: MarcasComponent, title: 'Marcas' },
+  { path: 'admin', component: AdminComponent },
+  { path: 'admin/usuarios', component: UsuariosComponent },
+   { path: 'admin/productos', component: ProductosComponent },
 
+  // 🔹 ADMIN con subrutas
+  {
+    path: 'admin',
+    component: AdminComponent,
+    children: [
+      { path: 'usuarios', component: UsuariosComponent, title: 'Gestión de Usuarios' },
+      // 🔹 Aquí más adelante podrás agregar:
+      // { path: 'productos', component: ProductosComponent },
+      // { path: 'reportes', component: ReportesComponent },
+    ],
+  },
 
   // 🔹 Cualquier otra ruta redirige al inicio
   { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes),
-    HttpClientModule
-  ],
-  exports: [RouterModule]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}

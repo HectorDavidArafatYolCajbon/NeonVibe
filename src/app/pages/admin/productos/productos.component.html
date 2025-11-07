@@ -1,0 +1,69 @@
+<div class="productos-container">
+  <h2>🛍️ Gestión de Productos</h2>
+
+  <!-- 🔍 Buscador elegante -->
+  <div class="busqueda">
+    <div class="busqueda-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        #buscador
+        type="text"
+        placeholder="Buscar producto por nombre, descripción o género..."
+        (input)="buscarProducto(buscador.value)"
+      />
+    </div>
+  </div>
+
+  <!-- 🧾 Formulario de creación -->
+  <div class="form-crear">
+    <input [(ngModel)]="nuevoProducto.nombre" placeholder="Nombre del producto" />
+    <input [(ngModel)]="nuevoProducto.descripcion" placeholder="Descripción" />
+    <select [(ngModel)]="nuevoProducto.genero">
+      <option value="">Seleccione género</option>
+      <option value="Hombre">Hombre</option>
+      <option value="Mujer">Mujer</option>
+      <option value="Unisex">Unisex</option>
+    </select>
+    <button (click)="crearProducto()">➕ Crear Producto</button>
+  </div>
+
+  <!-- ⏳ Estado de carga -->
+  <p *ngIf="cargando">Cargando productos...</p>
+
+  <!-- 📋 Tabla -->
+  <table *ngIf="!cargando && filtrados.length > 0; else sinProductos">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Género</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of filtrados">
+        <td>{{ p.id_producto }}</td>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.descripcion }}</td>
+        <td>{{ p.genero || '—' }}</td>
+        <td>
+          <span [class.activo]="p.activo" [class.inactivo]="!p.activo">
+            {{ p.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>
+          <button (click)="toggleEstado(p)">
+            {{ p.activo ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 🚫 Sin productos -->
+  <ng-template #sinProductos>
+    <p class="no-data">No hay productos registrados.</p>
+  </ng-template>
+</div>

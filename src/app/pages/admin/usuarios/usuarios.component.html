@@ -1,0 +1,63 @@
+<div class="usuarios-container">
+  <h2>👥 Gestión de Usuarios</h2>
+
+  <!-- 🔹 Formulario para crear usuario -->
+  <div class="form-crear">
+    <input [(ngModel)]="nuevoUsuario.nombre" placeholder="Nombre completo" />
+    <input [(ngModel)]="nuevoUsuario.email" type="email" placeholder="Correo electrónico" />
+    <input [(ngModel)]="nuevoUsuario.password" type="password" placeholder="Contraseña" />
+    <input [(ngModel)]="nuevoUsuario.direccion" placeholder="Dirección (opcional)" />
+
+    <select [(ngModel)]="nuevoUsuario.id_rol">
+      <option [value]="1">Administrador</option>
+      <option [value]="2">Cliente</option>
+    </select>
+
+    <button class="btn-crear" (click)="crearUsuario()">➕ Crear Usuario</button>
+  </div>
+
+  <!-- 🔹 Estado de carga -->
+  <p *ngIf="cargando" class="cargando">Cargando usuarios...</p>
+
+  <!-- 🔹 Tabla de usuarios -->
+  <table *ngIf="!cargando && usuarios.length > 0; else sinUsuarios" class="tabla-usuarios">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.id_usuario }}</td>
+        <td>{{ u.nombre }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.rol?.nombre_rol || (u.id_rol === 1 ? 'Administrador' : 'Cliente') }}</td>
+
+        <!-- Estado visual -->
+        <td>
+          <span [ngClass]="u.estado ? 'activo' : 'inactivo'">
+            {{ u.estado ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+
+        <!-- Botón de acción -->
+        <td>
+          <button class="btn-estado" (click)="toggleEstado(u)">
+            {{ u.estado ? 'Desactivar' : 'Activar' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 🔹 Si no hay usuarios -->
+  <ng-template #sinUsuarios>
+    <p class="no-data">No hay usuarios registrados.</p>
+  </ng-template>
+</div>

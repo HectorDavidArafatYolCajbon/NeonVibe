@@ -42,9 +42,10 @@ import { CarritoComponent } from './pages/carrito/carrito.component';
 import { FavoritosComponent } from './pages/favoritos/favoritos.component';
 import { CrearUsuarioDialogComponent } from './pages/crear-usuario-dialog/crear-usuario-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ReactiveFormsModule } from '@angular/forms';  // Si vas a usar ReactiveForms
-
-
+import { ReactiveFormsModule } from '@angular/forms';
+import { AdminComponent } from './pages/admin/admin.component';
+import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component';
+import { ProductosComponent } from './pages/admin/productos/productos.component';
 
 
 @NgModule({
@@ -74,11 +75,14 @@ import { ReactiveFormsModule } from '@angular/forms';  // Si vas a usar Reactive
     CarritoComponent,
     FavoritosComponent,
     CrearUsuarioDialogComponent,
-  ],
+    AdminComponent,
+    UsuariosComponent,
+    ProductosComponent,
+
+ ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
     // Angular Material
     MatToolbarModule,
     MatButtonModule,
@@ -86,7 +90,6 @@ import { ReactiveFormsModule } from '@angular/forms';  // Si vas a usar Reactive
     MatIconModule,
     MatCardModule,
     HttpClientModule,
-    BrowserModule,
     AppRoutingModule,
     FormsModule,
     MatDialogModule,  // Agregar MatDialogModule aquí

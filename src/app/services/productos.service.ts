@@ -6,30 +6,49 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class ProductosService {
-  private apiUrl = 'https://proyectoropa-ijsq.onrender.com/api/variantes';
+  // 🌐 URL base del backend en Render
+  private baseUrl = 'https://proyectoropa-ijsq.onrender.com/api';
+  private apiUrl = `${this.baseUrl}/variantes`;
+  private productosUrl = `${this.baseUrl}/productos`;
 
   // 🟢 Caché local de variantes
   cachedVariantes: any[] = [];
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Método para obtener variantes con caché actualizada
+  /* =====================================================
+     VARIANTES
+  ===================================================== */
+  // ✅ Obtener variantes y mantener caché local
   getVariantes(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
       tap((data: any[]) => {
-        // ✅ Guardamos variantes localmente para poder usarlas en selectSize()
         this.cachedVariantes = data;
       })
     );
   }
-    // ✅ Nuevo método para obtener productos directamente del backend
-  getProductos(): Observable<any[]> {
-    return this.http.get<any[]>('https://proyectoropa-ijsq.onrender.com/api/productos');
-  }
 
-  // Actualizar stock de una variante
+  // ✅ Actualizar stock de una variante
   updateVarianteStock(id_variante: number, cantidad: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id_variante}/stock`, { cantidad });
   }
 
+  /* =====================================================
+     PRODUCTOS
+  ===================================================== */
+  // ✅ Obtener todos los productos del backend
+  getProductos(): Observable<any[]> {
+    return this.http.get<any[]>(this.productosUrl);
+  }
+
+  // ✅ Crear un nuevo producto
+  crearProducto(producto: any): Observable<any> {
+    return this.http.post(this.productosUrl, producto);
+  }
+
+  // ✅ Cambiar el estado (activar/desactivar)
+  cambiarEstado(id_producto: number, activo: boolean): Observable<any> {
+    // usamos PUT porque tu backend usa update con req.body
+    return this.http.put(`${this.productosUrl}/${id_producto}`, { activo });
+  }
 }

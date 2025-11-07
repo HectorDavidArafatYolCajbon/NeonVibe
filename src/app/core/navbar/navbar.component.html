@@ -1,6 +1,6 @@
 <mat-toolbar class="navbar" color="primary">
   <div class="navbar-content">
-    <!-- 🔹 Sección de usuario a la izquierda (solo cuando hay sesión) -->
+    <!-- 🔹 Sección izquierda: Logout + saludo -->
     <div class="user-section-left" *ngIf="isLoggedIn">
       <button mat-icon-button aria-label="Logout" (click)="logout()">
         <mat-icon>logout</mat-icon>
@@ -8,12 +8,11 @@
       <span class="greeting">Hola, {{ currentUser?.nombre }}!</span>
     </div>
 
-    <!-- 🔹 Logo -->
+    <!-- 🔹 Logo (siempre visible) -->
     <h1 class="logo" routerLink="/">NEONVIBE</h1>
 
-    <!-- 🔹 Menú principal -->
-    <div class="nav-menu">
-
+    <!-- 🔹 Menú principal (solo si NO es modo admin) -->
+    <div class="nav-menu" *ngIf="!isAdminView">
       <!-- HOMBRES -->
       <button mat-button [matMenuTriggerFor]="hombres">HOMBRES</button>
       <mat-menu #hombres="matMenu">
@@ -25,7 +24,7 @@
       <!-- MUJERES -->
       <button mat-button [matMenuTriggerFor]="mujeres">MUJERES</button>
       <mat-menu #mujeres="matMenu">
-        <button mat-menu-item routerLink="/mujeres/vestidos">Fald and vest</button>
+        <button mat-menu-item routerLink="/mujeres/vestidos">Vestidos</button>
         <button mat-menu-item routerLink="/mujeres/blusas">Blusas</button>
         <button mat-menu-item routerLink="/mujeres/zapatos">Zapatos</button>
       </mat-menu>
@@ -40,8 +39,8 @@
       <button mat-button routerLink="/marcas">MARCAS</button>
     </div>
 
-    <!-- 🔹 Íconos a la derecha -->
-    <div class="icons">
+    <!-- 🔹 Íconos a la derecha (solo si NO es modo admin) -->
+    <div class="icons" *ngIf="!isAdminView">
       <button mat-icon-button aria-label="Carrito de compras" routerLink="/carrito">
         <mat-icon>shopping_cart</mat-icon>
       </button>
@@ -50,11 +49,10 @@
         <mat-icon>favorite</mat-icon>
       </button>
 
-      <!-- Mostrar icono de cuenta a la derecha solo si NO hay sesión -->
+      <!-- Icono de cuenta solo si NO hay sesión -->
       <button *ngIf="!isLoggedIn" mat-icon-button aria-label="Cuenta" routerLink="/login">
         <mat-icon>account_circle</mat-icon>
       </button>
-
     </div>
   </div>
 </mat-toolbar>

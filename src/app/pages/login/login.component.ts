@@ -12,7 +12,7 @@ import { CrearUsuarioDialogComponent } from '../crear-usuario-dialog/crear-usuar
 export class LoginComponent {
   email: string = '';
   password: string = '';
-  showPassword: boolean = false; // 👈 Nueva propiedad para alternar visibilidad
+  showPassword: boolean = false;
   loading: boolean = false;
 
   constructor(
@@ -21,7 +21,6 @@ export class LoginComponent {
     private router: Router
   ) {}
 
-  // Cambia el tipo del input (password ↔ text)
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
@@ -36,40 +35,78 @@ export class LoginComponent {
 
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
-        console.log('Login exitoso:', response);
-        console.log('Stored:', localStorage.getItem('auth_user'));
-        // Fetch user data if not stored
+        console.log('✅ Login exitoso:', response);
+        console.log('📦 Stored:', localStorage.getItem('auth_user'));
+
+        // ⚠️ Si el backend ya devuelve el usuario dentro del login, lo usamos directamente
+        const userLogin = response?.user || response;
+
+        // ✅ Detectar si es administrador según los datos del login
+        const isAdminLogin =
+          userLogin?.id_rol === 1 ||
+          userLogin?.id_usuario === 1 ||
+          userLogin?.role === 'admin' ||
+          userLogin?.rol?.toLowerCase() === 'administrador';
+
+        if (isAdminLogin) {
+          console.log('➡️ Redirigiendo al panel de administrador (desde login)...');
+          this.router.navigate(['/admin']);
+          this.loading = false;
+          return; // Evitamos la validación adicional
+        }
+
+        // 🔍 Si no trae datos completos, validar token para obtener el usuario
         this.authService.validateToken().subscribe({
           next: (user) => {
-            console.log('Fetched user:', user);
+            console.log('👤 Usuario obtenido:', user);
+
             if (user) {
               localStorage.setItem('auth_user', JSON.stringify(user));
+
+              // ✅ Detección del rol de administrador (según respuesta /me)
+              const isAdmin =
+                user.id_rol === 1 ||
+                user.id_usuario === 1 ||
+                user.role === 'admin' ||
+                (typeof user.rol === 'string' && user.rol.toLowerCase() === 'admin') ||
+                (typeof user.rol === 'object' && user.rol.nombre_rol?.toLowerCase() === 'admin');
+
+
+              if (isAdmin) {
+                console.log('➡️ Redirigiendo al panel de administrador...');
+                this.router.navigate(['/admin']);
+              } else {
+                console.log('➡️ Redirigiendo al home del cliente...');
+                this.router.navigate(['/']);
+              }
             }
+
+            this.loading = false;
           },
           error: (err) => {
             console.error('Error fetching user data:', err);
-          }
+            this.loading = false;
+            this.router.navigate(['/']);
+          },
         });
-        this.loading = false;
-        // Al iniciar sesión, ir a la página principal en lugar del carrito
-        this.router.navigate(['/']);
       },
       error: (error) => {
-        console.error('Error en login:', error);
+        console.error('❌ Error en login:', error);
         this.loading = false;
-        const message = error.error?.message || 'Error al iniciar sesión. Verifica tus credenciales.';
+        const message =
+          error.error?.message ||
+          'Error al iniciar sesión. Verifica tus credenciales.';
         alert(message);
-      }
+      },
     });
   }
 
-  // Abre el modal de crear usuario
   openCreateUserDialog(): void {
     const dialogRef = this.dialog.open(CrearUsuarioDialogComponent, {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       console.log('El modal se cerró');
     });
   }

@@ -1,3 +1,4 @@
+/* ===================== NAVBAR GENERAL ===================== */
 .navbar {
   background-color: #000;
   color: #fff;
@@ -5,34 +6,37 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   position: sticky;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  padding: 0.2rem 0 0.4rem 0; /* 👈 más delgada */
-  height: auto;
+  padding: 0.6rem 0; /* 👈 antes: 0.2rem 0 0.4rem 0 → ahora más alto */
+  height: 70px; /* 👈 altura visual más consistente */
 }
 
-/* CONTENEDOR PRINCIPAL */
+/* ===================== CONTENEDOR PRINCIPAL ===================== */
 .navbar-content {
   width: 100%;
   max-width: 1300px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.15rem; /* 👈 menor separación entre logo y menú */
+  gap: 0.25rem; /* un poco más de aire */
   padding: 0;
-  position: relative; /* permite posicionar elementos absolutos dentro */
+  position: relative;
 }
 
-/* SECCIÓN USUARIO IZQUIERDA */
+/* ===================== SECCIÓN USUARIO IZQUIERDA ===================== */
 .user-section-left {
   position: absolute;
-  left: 1.25rem; /* separado del borde izquierdo */
-  top: 0.6rem; /* alinear verticalmente con los iconos de la derecha */
+  left: 1.25rem;
+  top: 0.9rem; /* 👈 baja un poco el botón */
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -51,23 +55,24 @@
   }
 }
 
-/* LOGO CENTRADO */
+/* ===================== LOGO CENTRADO ===================== */
 .logo {
-  font-size: 2rem; /* 👈 ligeramente más pequeño */
-  letter-spacing: 0.6rem; /* menos espaciado */
+  font-size: 2rem;
+  letter-spacing: 0.6rem;
   text-transform: uppercase;
   color: #fff;
   margin: 0;
   line-height: 1;
   white-space: nowrap;
+  cursor: pointer;
 }
 
-/* MENÚ CENTRAL DEBAJO DEL LOGO */
+/* ===================== MENÚ CENTRAL ===================== */
 .nav-menu {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2.5rem; /* 👈 más compacto */
+  gap: 2.5rem;
   flex-wrap: nowrap;
   margin-top: 0.15rem;
 }
@@ -90,11 +95,11 @@
   }
 }
 
-/* ICONOS DERECHA */
+/* ===================== ICONOS DERECHA ===================== */
 .icons {
   position: absolute;
   right: 2rem;
-  top: 0.8rem; /* 👈 más arriba para la barra más delgada */
+  top: 0.8rem;
   display: flex;
   gap: 0.8rem;
 
@@ -112,7 +117,7 @@
   }
 }
 
-/* MENÚ DESPLEGABLE (SUBMENÚS) */
+/* ===================== MENÚ DESPLEGABLE ===================== */
 .mat-mdc-menu-content {
   background: #000;
   color: #fff;
@@ -126,7 +131,38 @@
   }
 }
 
-/* RESPONSIVE */
+/* ===================== MODO ADMINISTRADOR ===================== */
+:host-context(.admin-view) .navbar {
+  padding: 0.3rem 0;
+  height: auto;
+}
+
+:host-context(.admin-view) .navbar-content {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 2rem;
+  max-width: none; /* 👈 elimina límite interno para ocupar todo el ancho */
+}
+
+:host-context(.admin-view) .logo {
+  font-size: 1.8rem;
+  letter-spacing: 0.5rem;
+  margin: 0;
+}
+
+:host-context(.admin-view) .user-section-left {
+  position: static;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+:host-context(.admin-view) .nav-menu,
+:host-context(.admin-view) .icons {
+  display: none !important; /* 👈 oculta menú e íconos */
+}
+
+/* ===================== RESPONSIVE ===================== */
 @media (max-width: 900px) {
   .logo {
     font-size: 1.6rem;

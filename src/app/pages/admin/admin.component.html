@@ -1,0 +1,33 @@
+<div class="admin-container">
+  <!-- Logo central -->
+  <div class="logo-section">
+    <!-- Aquí podrías volver a poner el logo si deseas -->
+  </div>
+
+  <!-- 📌 Contenido dinámico: donde se mostrarán las subrutas -->
+  <router-outlet></router-outlet>
+
+  <!-- Botones principales (solo visibles si no estás dentro de una subruta) -->
+  <div class="admin-menu" *ngIf="mostrarMenu">
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1040/1040230.png" alt="PRODUCTOS" />
+      <button class="menu-btn" (click)="irAProductos()">PRODUCTOS</button>
+    </div>
+
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1297/1297859.png" alt="Usuarios" />
+      <button class="menu-btn" (click)="irAUsuarios()">USUARIOS</button>
+    </div>
+
+    <div class="menu-item">
+      <img src="https://cdn-icons-png.flaticon.com/512/1183/1183813.png" alt="REPORTES" />
+      <button class="menu-btn">REPORTES</button>
+    </div>
+  </div>
+
+  <!-- Footer con datos -->
+  <div class="footer-info">
+    <span>Bienvenido: <strong>Admin</strong></span>
+    <span>Rol: <strong>Administrador</strong></span>
+  </div>
+</div>

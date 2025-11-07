@@ -1,7 +1,6 @@
 /* 🎨 Import Angular Material primero */
 @use '@angular/material' as mat;
 
-
 /* ---------------------- */
 /* Paleta personalizada */
 /* ---------------------- */
@@ -22,25 +21,39 @@ $mi-tema: mat.define-light-theme((
 @include mat.all-component-themes($mi-tema);
 
 /* ---------------------- */
-/* Tus estilos globales */
+/* 🌎 Estilos globales */
 /* ---------------------- */
-:root { 
-  --container: 1200px; 
+:root {
+  --container: 1200px;
 }
 
-html, body { 
-  height: 100%; 
-}
-
-body {
+/* 🔧 Corrección estructural global */
+html, body {
   margin: 0;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: #fafafa;
+  padding: 0;
+  width: 100%;
+  min-height: 100%; /* 👈 permite crecer si hay contenido */
+  overflow-x: hidden; /* 👈 solo evita scroll horizontal, pero deja vertical */
+  box-sizing: border-box;
+  background: #fafafa; /* Fondo suave */
   color: #1f2937;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.container { 
-  max-width: var(--container); 
-  margin: 0 auto; 
-  padding: 0 16px; 
+/* 🔸 Asegura herencia correcta en todos los elementos */
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* 🔹 Contenedor general */
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ✅ Si alguna vista requiere bloquear scroll (por ejemplo modal abierto),
+   puedes aplicar esta clase temporalmente desde TS */
+.noscroll {
+  overflow: hidden !important;
 }

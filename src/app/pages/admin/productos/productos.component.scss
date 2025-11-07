@@ -1,0 +1,171 @@
+.productos-container {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  background-color: #f8f8f8;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+/* 🔹 Título */
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 🔍 Buscador */
+.busqueda {
+  width: 90%;
+  max-width: 600px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+
+  input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #000;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+/* 🧾 Formulario de creación */
+.form-crear {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  background: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+
+  input,
+  select {
+    padding: 0.6rem 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    min-width: 180px;
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      outline: none;
+      border-color: #000;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #222;
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* 📋 Tabla */
+table {
+  width: 90%;
+  max-width: 900px;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+
+  th {
+    background-color: #000;
+    color: #fff;
+    text-transform: uppercase;
+    padding: 0.9rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    text-align: center;
+    padding: 0.8rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover {
+    background-color: #f1f1f1;
+    transition: 0.2s;
+  }
+}
+
+/* 🔹 Estados */
+.activo {
+  color: #1fa742;
+  font-weight: 600;
+}
+
+.inactivo {
+  color: #c12c2c;
+  font-weight: 600;
+}
+
+/* 🔹 Mensaje cuando no hay productos */
+.no-data {
+  font-size: 1rem;
+  color: #666;
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .form-crear {
+    flex-direction: column;
+    align-items: stretch;
+
+    input,
+    select,
+    button {
+      width: 100%;
+    }
+  }
+
+  table {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    padding: 0.6rem;
+  }
+}
