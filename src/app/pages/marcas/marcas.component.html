@@ -98,8 +98,9 @@
     </div>
 
     <!-- Mensaje sin productos -->
-    <div class="no-products" *ngIf="!loadingProducts && productos.length === 0">
-      <p>No hay productos disponibles para esta marca.</p>
+    <div class="no-products-message" *ngIf="!loadingProducts && productos.length === 0">
+      <p>No se encontraron productos para esta marca.</p>
+      <button (click)="marcaSeleccionada = null">Volver a marcas</button>
     </div>
   </div>
 

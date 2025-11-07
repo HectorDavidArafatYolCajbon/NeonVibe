@@ -14,7 +14,6 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   showPassword: boolean = false;
-  showPassword: boolean = false;
   loading: boolean = false;
 
   constructor(
@@ -69,14 +68,13 @@ export class LoginComponent {
             if (user) {
               localStorage.setItem('auth_user', JSON.stringify(user));
 
-              // ✅ Detección del rol de administrador (según respuesta /me)
+              // Detección del rol de administrador (según respuesta /me)
               const isAdmin =
                 user.id_rol === 1 ||
                 user.id_usuario === 1 ||
                 user.role === 'admin' ||
                 (typeof user.rol === 'string' && user.rol.toLowerCase() === 'admin') ||
                 (typeof user.rol === 'object' && user.rol.nombre_rol?.toLowerCase() === 'admin');
-
 
               if (isAdmin) {
                 console.log('➡️ Redirigiendo al panel de administrador...');
@@ -90,12 +88,10 @@ export class LoginComponent {
             this.loading = false;
           },
           error: (err) => {
-            console.error('Error fetching user data:', err);
+            console.error('Error al obtener usuario:', err);
             this.loading = false;
             this.router.navigate(['/']);
-          },
-            console.error('Error al obtener usuario:', err);
-          },
+          }
         });
 
         this.loading = false;
@@ -120,26 +116,17 @@ export class LoginComponent {
       error: (error) => {
         console.error('❌ Error en login:', error);
         this.loading = false;
-        const message =
-          error.error?.message ||
-          'Error al iniciar sesión. Verifica tus credenciales.';
-        alert(message);
-      },
-        const message =
-          error.error?.message ||
-          'Error al iniciar sesión. Verifica tus credenciales.';
+        const message = error.error?.message || 'Error al iniciar sesión. Verifica tus credenciales.';
         Swal.fire('Error', message, 'error');
-      },
+      }
     });
   }
 
-  openCreateUserDialog(): void {
+  openCreateUserDialog() {
     const dialogRef = this.dialog.open(CrearUsuarioDialogComponent, {
-      width: '400px',
+      width: '400px'
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      console.log('El modal se cerró');
     dialogRef.afterClosed().subscribe((result) => {
       console.log('El modal de registro se cerró:', result);
     });

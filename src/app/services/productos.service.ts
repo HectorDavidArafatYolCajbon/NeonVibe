@@ -14,6 +14,11 @@ export class ProductosService {
   // 🟢 Caché local de variantes
   private cachedVariantes: any[] = [];
 
+  // ✅ Getter público para acceder a las variantes en caché
+  get getCachedVariantes(): any[] {
+    return this.cachedVariantes;
+  }
+
   constructor(private http: HttpClient) {}
 
   /* =====================================================
@@ -39,6 +44,46 @@ export class ProductosService {
   // ✅ Obtener todos los productos del backend
   getProductos(): Observable<any[]> {
     return this.http.get<any[]>(this.productosUrl);
+  }
+
+  // ✅ Obtener productos por marca
+  getProductosByMarca(id_marca: number): Observable<any[]> {
+    console.log('🔍 Buscando productos para marca:', id_marca);
+
+    return this.getVariantes().pipe(
+      map(variantes => {
+        console.log('Todas las variantes recibidas:', variantes.length);
+
+        const filtradas = variantes.filter(v => {
+          if (!v.producto) {
+            console.log('Variante sin producto:', v);
+            return false;
+          }
+
+          // Verificar si el producto tiene marca y coincide el ID
+          if (!v.producto.id_marca) {
+            console.log('Producto sin marca:', v.producto);
+            return false;
+          }
+
+          const productoMarcaId = parseInt(v.producto.id_marca);
+          const coincide = productoMarcaId === id_marca;
+
+          if (coincide) {
+            console.log('✅ Encontrada coincidencia:', {
+              varianteId: v.id_variante,
+              productoNombre: v.producto.nombre,
+              marcaId: productoMarcaId
+            });
+          }
+
+          return coincide;
+        });
+
+        console.log('📦 Variantes filtradas por marca:', filtradas);
+        return filtradas;
+      })
+    );
   }
 
   // ✅ Crear un nuevo producto

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { Subscription, finalize } from 'rxjs';
+import { Subscription, finalize, catchError, of, switchMap } from 'rxjs';
 import { MarcasService, Marca } from 'src/app/services/marcas.service';
 import { ProductosService } from 'src/app/services/productos.service';
 import { Product } from 'src/app/models/product';
@@ -35,8 +35,9 @@ interface ProductoAgrupado {
 export class MarcasComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   currentUser: any = null;
-  private userSubscription!: Subscription;
-  private marcasSubscription!: Subscription;
+  private userSubscription?: Subscription;
+  private marcasSubscription?: Subscription;
+  private productosSubscription?: Subscription;
   loading = true;
   error: string | null = null;
 
@@ -77,13 +78,27 @@ export class MarcasComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (marcas) => {
           console.log('Marcas cargadas:', marcas);
+          if (!marcas || !Array.isArray(marcas)) {
+            console.error('No se recibieron marcas válidas del servidor');
+            this.error = 'Error al cargar las marcas. Formato de datos incorrecto.';
+            return;
+          }
+
           this.marcas = marcas;
           // Extraer categorías únicas de las marcas
           const categoriasSet = new Set<string>();
           categoriasSet.add('Todas');
+
           marcas.forEach(marca => {
-            marca.categorias.forEach(cat => categoriasSet.add(cat));
+            if (marca && Array.isArray(marca.categorias)) {
+              marca.categorias.forEach(cat => {
+                if (cat) categoriasSet.add(cat);
+              });
+            } else {
+              console.warn('Marca con categorías inválidas:', marca);
+            }
           });
+
           this.categorias = Array.from(categoriasSet);
         },
         error: (err) => {
@@ -99,28 +114,65 @@ export class MarcasComponent implements OnInit, OnDestroy {
   }
 
   /** Obtener marcas filtradas */
-  get marcasFiltradas() {
+  get marcasFiltradas(): Marca[] {
     if (this.categoriaSeleccionada === 'Todas') {
       return this.marcas;
     }
     return this.marcas.filter(marca =>
+      marca.categorias && Array.isArray(marca.categorias) &&
       marca.categorias.includes(this.categoriaSeleccionada)
     );
   }
 
   /** Ver detalle de marca */
   verDetalle(marca: Marca): void {
+    console.log('Viendo detalle de marca:', marca);
     this.marcaSeleccionada = marca;
     this.loadingProducts = true;
-    
+    this.error = null;
+    this.productos = [];
+
     if (!marca.id_marca) {
-      this.error = 'Error al cargar productos: ID de marca no encontrado';
+      console.error('ID de marca no válido:', marca.id_marca);
+      this.error = 'Error al cargar productos: ID de marca no válido';
       this.loadingProducts = false;
       return;
     }
-    
-    this.productosService.getProductosByMarca(marca.id_marca).subscribe({
+
+    // Asegurarnos de que el ID sea un número válido
+    const idMarca = typeof marca.id_marca === 'string' ?
+                   parseInt(marca.id_marca) :
+                   (typeof marca.id_marca === 'number' ? marca.id_marca : null);
+
+    if (!idMarca || isNaN(idMarca)) {
+      console.error('ID de marca inválido:', marca.id_marca);
+      this.error = 'Error al cargar productos: ID de marca inválido';
+      this.loadingProducts = false;
+      return;
+    }
+
+    console.log('🏷️ Procesando marca:', marca.nombre, 'con ID:', idMarca);
+
+    // Cargar los productos
+    this.productosSubscription?.unsubscribe();
+    this.productosSubscription = this.productosService.getProductosByMarca(idMarca).pipe(
+      catchError(error => {
+        console.error('Error al cargar productos:', error);
+        this.error = 'Error al cargar los productos. Por favor, intente más tarde.';
+        this.loadingProducts = false;
+        return of([]);
+      })
+    ).subscribe({
       next: (variantes) => {
+        if (!variantes || variantes.length === 0) {
+          console.warn('⚠️ No se encontraron productos para esta marca');
+          this.productos = [];
+          this.loadingProducts = false;
+          return;
+        }
+
+        console.log('✅ Variantes recibidas:', variantes);
+
         // Agrupar variantes por producto
         const agrupadas: Record<string, {
           id: string;
@@ -170,7 +222,7 @@ export class MarcasComponent implements OnInit, OnDestroy {
           // Agregar tallas y precios
           const descuento = parseFloat((v.descuento ?? '0').toString());
           const precio = parseFloat((v.precio_final ?? v.precio_venta ?? '0').toString());
-          
+
           agrupadas[idProducto].sizes.push({
             talla: v.talla || 'N/A',
             stock: v.stock?.stock ?? 0,
@@ -198,10 +250,12 @@ export class MarcasComponent implements OnInit, OnDestroy {
           };
         });
 
+        console.log('Productos procesados:', this.productos);
         this.loadingProducts = false;
       },
-      error: (err) => {
-        console.error('Error al cargar productos de la marca:', err);
+      error: (err: any) => {
+        console.error('Error al cargar los productos:', err);
+        this.error = 'Error al cargar los productos. Por favor, intente más tarde.';
         this.loadingProducts = false;
       }
     });
@@ -214,11 +268,8 @@ export class MarcasComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-    if (this.marcasSubscription) {
-      this.marcasSubscription.unsubscribe();
-    }
+    this.userSubscription?.unsubscribe();
+    this.marcasSubscription?.unsubscribe();
+    this.productosSubscription?.unsubscribe();
   }
 }

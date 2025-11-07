@@ -24,10 +24,22 @@ export class MarcasService {
    * Obtiene todas las marcas disponibles
    */
   getMarcas(): Observable<Marca[]> {
-    return this.http.get<Marca[]>(this.apiUrl)
+    return this.http.get<any[]>(this.apiUrl)
       .pipe(
+        map(marcas => {
+          return marcas.map(marca => ({
+            ...marca,
+            // Si no hay categorías, asignamos un array con 'General'
+            categorias: Array.isArray(marca.categorias) ? marca.categorias : ['General'],
+            // Aseguramos que el id_marca sea string
+            id_marca: marca.id_marca.toString(),
+            // Valores por defecto para campos opcionales
+            descripcion: marca.descripcion || `Productos ${marca.nombre}`,
+            destacada: !!marca.destacada
+          }));
+        }),
         tap((marcas: Marca[]) => {
-          console.log('Marcas del servidor:', marcas);
+          console.log('Marcas procesadas:', marcas);
         }),
         retry(3),
         catchError(this.handleError)
