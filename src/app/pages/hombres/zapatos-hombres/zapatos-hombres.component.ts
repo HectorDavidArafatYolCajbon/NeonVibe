@@ -46,19 +46,34 @@ export class ZapatosHombresComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.productosService.getVariantes().subscribe({
       next: (data) => {
+        console.log('Datos recibidos:', data); // Ver todos los datos que llegan
         const zapatos = data.filter(
           (v: any) => {
             const name = v.producto?.nombre?.toLowerCase() || '';
             const model = v.modelo?.toLowerCase() || '';
+            const genero = v.producto?.genero || '';
+            
+            console.log('Revisando producto:', { name, model, genero }); // Ver cada producto que se revisa
+            
+            // Verificar si es un zapato
             const isShoe =
-              name.includes('zapatilla') || name.includes('tenis') ||
-              model.includes('zapatilla') || model.includes('tenis');
+              name.includes('zapatilla') || name.includes('zapatillas') ||
+              name.includes('tenis') || name.includes('zapato') ||
+              model.includes('zapatilla') || model.includes('zapatillas') ||
+              model.includes('tenis') || model.includes('zapato');
+            
+            console.log('¿Es zapato?:', isShoe);
+            
+            // Verificar si es para hombre (por nombre, modelo o género)
             const isMen =
               name.includes('hombre') || name.includes('men') ||
-              model.includes('hombre') || model.includes('men');
+              model.includes('hombre') || model.includes('men') ||
+              genero === 'HOMBRE';
+              
             const isNotWomen =
               !name.includes('mujer') && !model.includes('mujer');
-            return isShoe && isMen && isNotWomen;
+              
+            return isShoe && (isMen || genero === 'HOMBRE') && isNotWomen;
           }
         );
 
@@ -161,7 +176,7 @@ export class ZapatosHombresComponent implements OnInit, OnDestroy {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
 
-    const variante = (this.productosService.cachedVariantes || []).find(
+    const variante = (this.productosService.getCachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
         v.talla === size.talla
@@ -243,12 +258,12 @@ export class ZapatosHombresComponent implements OnInit, OnDestroy {
   /** ❤️ Favoritos */
   addToFavorites(): void {
     if (!this.isLoggedIn) {
+      this.closeModal();
       this.toastModal('Debes iniciar sesión para agregar a favoritos', 'info');
       return;
     }
 
     if (!this.selectedSize || !this.selectedVarianteId) {
-      this.closeModal();
       this.toastModal('Selecciona una talla antes de agregar a favoritos', 'warning');
       return;
     }
