@@ -1,4 +1,6 @@
-// Variables
+// ==============================
+// 🎨 VARIABLES DE COLOR Y TEMA
+// ==============================
 $primary-color: #6a1b9a;
 $hover-color: #54277e;
 $error-color: #e53935;
@@ -7,15 +9,16 @@ $text-light: #666;
 $border-color: #eee;
 $shadow-color: rgba(106, 27, 154, 0.15);
 
-// Aliases for compatibility
 $primary: $primary-color;
 $error: $error-color;
 $primary-dark: $hover-color;
 
-// Mixins
+// ==============================
+// 🔧 MIXINS
+// ==============================
 @mixin button-base {
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.25s ease;
@@ -28,7 +31,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Estilos base
+// ==============================
+// ⚙️ ESTRUCTURA GENERAL
+// ==============================
 :host {
   display: block;
   width: 100%;
@@ -46,7 +51,9 @@ $primary-dark: $hover-color;
   }
 }
 
-// Contenedor del carrito
+// ==============================
+// 🛒 CONTENEDOR PRINCIPAL
+// ==============================
 .cart-container {
   display: flex;
   justify-content: space-between;
@@ -56,7 +63,9 @@ $primary-dark: $hover-color;
   margin: 0 auto;
 }
 
-// Lista de items
+// ==============================
+// 🧺 LISTA DE PRODUCTOS
+// ==============================
 .cart-items {
   flex: 1;
   min-width: 300px;
@@ -64,17 +73,31 @@ $primary-dark: $hover-color;
 
 .cart-item {
   display: grid;
-  grid-template-columns: 80px 1fr auto auto;
+  grid-template-columns: 80px 1fr auto auto auto;
   gap: 1rem;
   align-items: center;
   padding: 1rem;
   margin-bottom: 1rem;
   border: 1px solid $border-color;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: box-shadow 0.2s ease;
 
   &:hover {
     box-shadow: 0 4px 10px $shadow-color;
+  }
+
+  > .delete-btn {
+    justify-self: center;
+    align-self: center;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #999;
+    cursor: pointer;
+
+    &:hover {
+      color: $error-color;
+    }
   }
 }
 
@@ -82,9 +105,12 @@ $primary-dark: $hover-color;
   width: 80px;
   height: 80px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
+// ==============================
+// 🧾 INFORMACIÓN DEL PRODUCTO
+// ==============================
 .item-info {
   text-align: left;
 
@@ -102,43 +128,55 @@ $primary-dark: $hover-color;
   }
 }
 
-// Precio y descuentos
-.price {
+// ==============================
+// 💰 PRECIO Y DESCUENTOS
+// ==============================
+.price-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  font-weight: 700;
+  margin-top: 0.5rem;
 
-  .old {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 0.9rem;
-  }
-
-  .discounted {
-    color: $primary-color;
+  .price {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-weight: 700;
+
+    .old {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .discounted {
+      color: $primary-color;
+    }
+
+    .discount-badge {
+      background: $error-color;
+      color: white;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-left: 0.25rem;
+    }
   }
 }
 
-.discount-badge {
-  background: $error-color;
-  color: white;
-  font-size: 0.8rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-// Controles de cantidad
+// ==============================
+// ➕➖ CONTROLES DE CANTIDAD
+// ==============================
 .item-controls {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 
   button {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     background: #f5f5f5;
     border: none;
     border-radius: 50%;
@@ -153,16 +191,19 @@ $primary-dark: $hover-color;
   }
 
   span {
-    font-weight: 600;
+    font-weight: 700;
+    color: $text-dark;
   }
 }
 
 .item-total {
-  font-weight: 700;
+  font-weight: 800;
   color: $primary-color;
 }
 
-// Botón eliminar
+// ==============================
+// ❌ BOTÓN ELIMINAR
+// ==============================
 .delete-btn {
   border: none;
   background: none;
@@ -177,18 +218,32 @@ $primary-dark: $hover-color;
   }
 }
 
-// Acciones del carrito
+// ==============================
+// 🔻 ACCIONES DEL CARRITO
+// ==============================
 .cart-actions {
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 
   button {
-    padding: 0.75rem 1.5rem;
+    padding: 0.8rem 1.6rem;
     @include button-base;
     background: $primary-color;
     color: white;
-    @include hover-transform;
+
+    &.continue-btn {
+      background: #f1ecf7;
+      color: $primary-color;
+      border: 1px solid rgba(106, 27, 154, 0.25);
+
+      &:hover {
+        background: #e9e1f4;
+        transform: translateY(-2px);
+      }
+    }
 
     &.clear-cart {
       background: transparent;
@@ -200,16 +255,36 @@ $primary-dark: $hover-color;
         color: white;
       }
     }
+
+    &.pay-now-btn {
+      background: linear-gradient(90deg, #8c2eff, #6a1b9a);
+      box-shadow: 0 6px 18px rgba(106, 27, 154, 0.25);
+
+      &:hover {
+        background: linear-gradient(90deg, #6a1b9a, #8c2eff);
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        background: #cfc1e4;
+        color: #fff;
+        box-shadow: none;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
   }
 }
 
-// Caja de checkout
+// ==============================
+// 💳 CAJA DE CHECKOUT
+// ==============================
 .checkout-box {
-  width: 350px;
+  width: 360px;
   padding: 1.5rem;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  background: #f9f9fb;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
   h3, h4 {
     margin-bottom: 1rem;
@@ -219,12 +294,14 @@ $primary-dark: $hover-color;
 
 .total {
   font-size: 1.25rem;
-  font-weight: bold;
+  font-weight: 800;
   color: $primary-color;
   margin: 1rem 0;
 }
 
-// Formulario de cliente
+// ==============================
+// 👤 FORMULARIO DE CLIENTE
+// ==============================
 .cliente-form {
   display: flex;
   flex-direction: column;
@@ -232,89 +309,66 @@ $primary-dark: $hover-color;
   margin-bottom: 1.5rem;
 
   input {
-    padding: 0.75rem;
+    padding: 0.8rem;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 10px;
     transition: 0.2s ease;
+    font-weight: 500;
 
     &:focus {
       border-color: $primary-color;
       outline: none;
-      box-shadow: 0 0 4px rgba($primary-color, 0.3);
+      box-shadow: 0 0 6px rgba($primary-color, 0.25);
     }
   }
 }
 
-// Stripe Elements
+// ==============================
+// 💳 STRIPE ELEMENTS
+// ==============================
 .stripe-container {
   margin-top: 1rem;
+
+  h4 {
+    margin-bottom: 0.6rem;
+  }
 }
 
 .stripe-element {
-  padding: 0;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   background: white;
   margin-bottom: 1rem;
   height: 60px;
-  position: relative;
-
-  // Stripe specific styles
-  .StripeElement {
-    padding: 12px 15px !important;
-    height: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-
-    input {
-      border: none !important;
-      outline: none !important;
-      font-size: 16px !important;
-      width: 100% !important;
-      height: 100% !important;
-    }
-  }
-
-  // Ensure iframe is fully visible
-  iframe {
-    width: 100% !important;
-    height: 100% !important;
-    border: none !important;
-    display: block !important;
-    visibility: visible !important;
-    z-index: 1 !important;
-  }
-
-  &--focus {
-    border-color: $primary-color;
-    box-shadow: 0 0 4px rgba($primary-color, 0.3);
-  }
 }
 
-#card-errors {
-  color: $error-color;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-
+// ✅ Botón "Pagar ahora"
 .pay-button {
   width: 100%;
-  padding: 1rem;
+  padding: 0.95rem 1.2rem;
   @include button-base;
-  background: $primary-color;
-  color: white;
+  background: linear-gradient(90deg, #8c2eff, #6a1b9a);
+  color: #fff;
+  letter-spacing: .2px;
+  box-shadow: 0 8px 20px rgba(106, 27, 154, .25);
 
   &:hover {
-    background: $hover-color;
+    background: linear-gradient(90deg, #6a1b9a, #8c2eff);
+    transform: translateY(-2px);
   }
 
   &:disabled {
-    background: #ccc;
+    background: #cfc1e4;
+    color: #fff;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
   }
 }
 
-// Mensajes de estado
+// ==============================
+// 💬 ESTADOS: Vacío / Éxito
+// ==============================
 .empty-cart,
 .success-message {
   text-align: center;
@@ -326,11 +380,69 @@ $primary-dark: $hover-color;
     font-size: 1.1rem;
   }
 
-  button {
+  .continue-btn {
     @include button-base;
-    background: $primary-color;
-    color: white;
-    padding: 10px 20px;
-    @include hover-transform;
+    padding: 0.9rem 1.6rem;
+    background: linear-gradient(90deg, #8c2eff, #6a1b9a);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(106, 27, 154, .25);
+
+    &:hover {
+      background: linear-gradient(90deg, #6a1b9a, #8c2eff);
+      transform: translateY(-2px);
+    }
   }
+}
+
+// ==============================
+// 💜 SWEETALERT (base)
+// ==============================
+.neon-popup {
+  box-shadow: 0 0 22px rgba(138, 43, 226, 0.5);
+  border-radius: 16px !important;
+  font-family: 'Poppins', sans-serif;
+}
+
+.neon-confirm-btn {
+  background: linear-gradient(90deg, #8c2eff, #6a1b9a) !important;
+  color: #fff !important;
+  border-radius: 24px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  padding: 10px 26px !important;
+  box-shadow: 0 0 10px rgba(138, 43, 226, 0.35);
+  transition: all 0.3s ease;
+}
+
+.neon-cancel-btn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  border-radius: 24px !important;
+  font-weight: 500 !important;
+  padding: 10px 26px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+.neon-confirm-btn:hover {
+  background: linear-gradient(90deg, #6a1b9a, #8c2eff) !important;
+  box-shadow: 0 0 18px rgba(138, 43, 226, 0.5);
+}
+
+// ==============================
+// 🔄 Loader simple para Swal
+// ==============================
+.simple-loader {
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #8c2eff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: 10px auto;
+  animation: spinSimple 1s linear infinite;
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+}
+
+@keyframes spinSimple {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

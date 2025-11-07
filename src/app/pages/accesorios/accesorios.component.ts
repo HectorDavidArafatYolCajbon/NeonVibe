@@ -8,6 +8,7 @@ import { ProductosService } from 'src/app/services/productos.service';
 import { CartService } from 'src/app/services/cart.service';
 import { FavoritesService } from 'src/app/services/favorites.service';
 import { Product } from 'src/app/models/product';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-accesorios',
@@ -25,11 +26,11 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedSize: string = '';
   loading = true;
 
-  // 🌀 Imágenes del carrusel
+  // 🌀 Carrusel
   accesoriosImages: string[] = [
-    'https://plus.unsplash.com/premium_photo-1661645449694-5bf9766205e1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170',
-    'https://images.pexels.com/photos/11926130/pexels-photo-11926130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    'https://images.unsplash.com/photo-1569388330292-79cc1ec67270?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170'
+    'https://plus.unsplash.com/premium_photo-1661645449694-5bf9766205e1?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1170',
+    'https://images.pexels.com/photos/11926130/pexels-photo-11926130.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+    'https://images.unsplash.com/photo-1569388330292-79cc1ec67270?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1170'
   ];
 
   constructor(
@@ -49,7 +50,6 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** 🌀 Inicializar carrusel Swiper */
   ngAfterViewInit(): void {
     Swiper.use([Autoplay, Pagination, Navigation]);
     new Swiper('.main-swiper', {
@@ -63,7 +63,7 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /** 💜 Cargar accesorios agrupando variantes */
+  /** 👜 Cargar accesorios */
   cargarAccesorios(): void {
     this.loading = true;
     this.productosService.getVariantes().subscribe({
@@ -92,7 +92,6 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
             };
           }
 
-          // Combinar imágenes de producto y variante
           const nuevasImgs = [
             v.imagen_url,
             ...(v.imagenes?.map((img: any) => img.url) || [])
@@ -104,7 +103,6 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           }
 
-          // Añadir tallas y precios
           agrupadas[idProducto].sizes.push({
             talla: v.talla || 'Única',
             stock: v.stock?.stock ?? 0,
@@ -116,9 +114,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
           agrupadas[idProducto].precios.push(parseFloat(v.precio_venta ?? v.precio_final ?? 0));
         }
 
-        // ✅ Lógica correcta de precios (ya la tenías bien)
         this.products = Object.values(agrupadas).map((p: any) => {
-          const maxPrecio = Math.max(...p.precios); // precio original
+          const maxPrecio = Math.max(...p.precios);
           const minPrecio = Math.min(...p.precios);
           const maxDesc = Math.max(...p.descuentos);
 
@@ -132,8 +129,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
             ...p,
             image: p.images[0] || 'https://via.placeholder.com/400x400?text=Sin+Imagen',
             descuento: tieneDescuento ? maxDesc : 0,
-            price: precioConDescuento, // 🔴 precio con descuento
-            oldPrice: precioBase,      // ⚫ precio original tachado
+            price: precioConDescuento,
+            oldPrice: precioBase,
             tieneRango: maxPrecio !== minPrecio
           };
         });
@@ -147,14 +144,13 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // ==========================
-  // 🔹 Modal y selección
-  // ==========================
+  // =========================
+  // 🪞 Modal
+  // =========================
   openModal(product: Product) {
     this.selectedProduct = { ...product };
-    this.activeImage = product.images?.[0] || '';
+    this.activeImage = product.images?.[0] || product.image || 'https://via.placeholder.com/400x400?text=Sin+Imagen';
     this.selectedSize = '';
-
     (this.selectedProduct as any).basePrice = product.price;
     (this.selectedProduct as any).baseOldPrice = product.oldPrice;
     (this.selectedProduct as any).baseDescuento = product.descuento;
@@ -162,6 +158,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
 
   closeModal() {
     this.selectedProduct = null;
+    this.selectedSize = '';
+    this.selectedVarianteId = null;
   }
 
   nextImage() {
@@ -180,15 +178,14 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
       ];
   }
 
-  /** 🔹 Al seleccionar una talla */
   selectSize(size: any) {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
 
-    const variante = (this.productosService.cachedVariantes || []).find(
+    const variante = (this.productosService.getCachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
-        v.talla === size.talla
+        (v.talla || 'Única') === size.talla
     );
 
     if (variante) {
@@ -207,23 +204,15 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
         void priceEl.offsetWidth;
         priceEl.classList.add('price-change');
       }
-    } else {
-      this.selectedVarianteId = null;
-      this.selectedProduct.price = (this.selectedProduct as any).basePrice ?? 0;
-      this.selectedProduct.oldPrice = (this.selectedProduct as any).baseOldPrice ?? 0;
-      this.selectedProduct.descuento = (this.selectedProduct as any).baseDescuento ?? 0;
     }
   }
 
-  /** 🛒 Agregar producto al carrito */
-  addToCart(selectedProduct: any): void {
-    if (!this.selectedProduct) {
-      alert('Error: no hay producto seleccionado.');
-      return;
-    }
+  /** 🛍️ Agregar al carrito */
+  addToCart(): void {
+    if (!this.selectedProduct) return;
 
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla antes de agregar al carrito.');
+      this.toastModal('Selecciona una talla antes de agregar al carrito', 'warning');
       return;
     }
 
@@ -231,14 +220,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
       (s: any) => s.talla === this.selectedSize
     );
 
-    if (!selectedSizeData) {
-      alert('Error: talla no encontrada o sin información de stock.');
-      return;
-    }
-
-    const stockDisponible = selectedSizeData.stock ?? 0;
-    if (stockDisponible <= 0) {
-      alert('🚫 Este producto está agotado.');
+    if (!selectedSizeData || selectedSizeData.stock <= 0) {
+      this.toastModal('🚫 Este producto está agotado', 'error');
       return;
     }
 
@@ -250,8 +233,8 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     if (existing) {
-      if (existing.cantidad >= stockDisponible) {
-        alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+      if (existing.cantidad >= selectedSizeData.stock) {
+        this.toastModal(`Solo hay ${selectedSizeData.stock} unidades disponibles`, 'warning');
         return;
       }
       existing.cantidad++;
@@ -263,57 +246,89 @@ export class AccesoriosComponent implements OnInit, AfterViewInit, OnDestroy {
         talla: this.selectedSize,
         image: this.activeImage,
         precio_final: this.selectedProduct.price,
+        oldPrice: this.selectedProduct.oldPrice,
+        descuento: this.selectedProduct.descuento,
         cantidad: 1,
-        stock: stockDisponible
+        stock: selectedSizeData.stock
       };
       this.cartService.addToCart(productToAdd);
     }
 
-    alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+    this.toastModal(`${this.selectedProduct.name} Agregar al Carrito 🛍️`, 'success');
     this.closeModal();
   }
 
-  ngOnDestroy(): void {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-  }
-
-  // Métodos para favoritos
-  /** Agregar a favoritos */
+  /** ❤️ Agregar a favoritos */
   addToFavorites(): void {
-    if (!this.selectedProduct) return;
+    if (!this.isLoggedIn) {
+      this.closeModal();
+      this.toastModal('Debes iniciar sesión para agregar a favoritos', 'info');
+      return;
+    }
+
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla');
+      this.closeModal();
+      this.toastModal('Selecciona una talla antes de agregar a favoritos', 'warning');
       return;
     }
 
     this.favoritesService.addToFavorites({
       id_variante: this.selectedVarianteId,
-      name: this.selectedProduct.name,
+      name: this.selectedProduct?.name,
       talla: this.selectedSize,
       image: this.activeImage,
-      precio_final: this.selectedProduct.price
+      precio_final: this.selectedProduct?.price
     });
-    alert('✅ Producto agregado a favoritos');
+
+    this.toastModal('Agregado a tus favoritos 💗', 'success');
+    this.closeModal();
   }
 
-  /** Quitar de favoritos */
+  /** 💔 Quitar de favoritos */
   removeFromFavorites(): void {
     if (this.selectedVarianteId) {
       this.favoritesService.removeFromFavorites(this.selectedVarianteId, this.selectedSize);
-      alert('✅ Producto removido de favoritos');
+      this.toastModal('Eliminado de favoritos 💔', 'info');
+      this.closeModal();
     }
   }
 
-  /** Verificar si está en favoritos */
-  isInFavorites(): boolean {
-    return this.selectedVarianteId ?
-      this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize) : false;
+  /** 🚪 Cerrar sesión */
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.toastModal('Sesión cerrada correctamente', 'info');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Error al cerrar sesión:', err);
+        this.toastModal('Error al cerrar sesión', 'error');
+      }
+    });
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
+  isInFavorites(): boolean {
+    if (!this.selectedVarianteId) return false;
+    return this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize);
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) this.userSubscription.unsubscribe();
+  }
+
+  /** 🌑 Toast oscuro NeonVibe */
+  private toastModal(title: string, icon: 'success' | 'error' | 'info' | 'warning') {
+    Swal.fire({
+      icon,
+      title,
+      position: 'top',
+      toast: true,
+      background: '#000',
+      color: '#fff',
+      showConfirmButton: false,
+      timer: 1900,
+      backdrop: false,
+      customClass: { popup: 'neon-toast-dark' }
+    });
   }
 }

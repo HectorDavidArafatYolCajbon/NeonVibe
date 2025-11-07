@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class ProductosService {
   private productosUrl = `${this.baseUrl}/productos`;
 
   // 🟢 Caché local de variantes
-  cachedVariantes: any[] = [];
+  private cachedVariantes: any[] = [];
 
   constructor(private http: HttpClient) {}
 

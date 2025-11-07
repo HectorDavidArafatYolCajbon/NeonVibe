@@ -192,6 +192,6 @@ export class HomeComponent implements AfterViewInit, OnInit {
     };
 
     this.cartService.addToCart(productToAdd);
-    alert(`✅ ${item.name} (talla ${item.selectedSize}) agregado a la bolsa`);
+    alert(`✅ ${item.name} (talla ${item.selectedSize}) Agregar al Carrito`);
   }
 }

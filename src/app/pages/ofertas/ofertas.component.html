@@ -103,11 +103,14 @@
         </div>
       </div>
 
-      <button class="add-to-cart"
-        [disabled]="!selectedSize"
-        (click)="addToCart()">
-  Agregar al Carrito
+<button
+  class="add-to-cart"
+  (click)="addToCart()"
+  [disabled]="!selectedSize || !selectedVarianteId">
+  Agregar al carrito
 </button>
+
+
 
     </div>
   </div>

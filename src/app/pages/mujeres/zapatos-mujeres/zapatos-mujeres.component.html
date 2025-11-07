@@ -91,7 +91,7 @@
       <p class="desc">{{ selectedProduct.description }}</p>
 
       <!-- 📏 Selector de tallas -->
-      <ng-container *ngIf="selectedProduct?.sizes as sizes">
+      <ng-container *ngIf="selectedProduct && selectedProduct.sizes as sizes">
         <div class="size-selector" *ngIf="sizes.length > 0">
           <label>Tallas disponibles:</label>
           <div class="size-options">

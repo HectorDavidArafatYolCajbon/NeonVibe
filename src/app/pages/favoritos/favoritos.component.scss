@@ -7,17 +7,16 @@
     text-align: center;
     font-size: 1.8rem;
     margin-bottom: 2rem;
+    color: #6a1b9a;
+    font-weight: 800;
   }
 
-  // Mensaje cuando no hay favoritos
   .empty-message {
     text-align: center;
     padding: 3rem 1rem;
 
     mat-icon {
       font-size: 3rem;
-      width: 3rem;
-      height: 3rem;
       color: #999;
       margin-bottom: 1rem;
     }
@@ -28,37 +27,46 @@
     }
   }
 
-  // Grid de favoritos
   .favorites-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
   }
 
-  // Tarjeta de favorito
   .favorite-card {
     border: 1px solid #eee;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
     transition: transform 0.2s ease;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
     }
 
     .img-wrap {
       width: 100%;
-      height: 280px;
-      overflow: hidden;
+      height: 260px;
+      position: relative;
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
+      }
+
+      .agotado-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #d32f2f;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        border-radius: 5px;
       }
     }
 
@@ -69,13 +77,14 @@
         margin: 0 0 0.5rem;
         font-size: 1.1rem;
         color: #333;
-        font-weight: 600;
+        font-weight: 700;
       }
 
-      .size {
+      .size,
+      .stock {
         color: #666;
-        margin-bottom: 0.5rem;
         font-size: 0.9rem;
+        margin-bottom: 0.3rem;
       }
 
       .price {
@@ -92,23 +101,37 @@
 
         button[mat-raised-button] {
           flex: 1;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+
+        button[mat-raised-button][disabled] {
+          background-color: #ccc !important;
+          color: #fff !important;
+          cursor: not-allowed;
         }
 
         button[mat-icon-button] {
           color: #f44336;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: scale(1.15);
+          }
         }
       }
     }
   }
 }
 
-// Responsive
-@media (max-width: 600px) {
-  .favorites-container {
-    padding: 1rem;
-
-    .favorites-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+/* Toast oscuro */
+.neon-toast-dark {
+  border-radius: 14px !important;
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.4), 0 0 6px rgba(255, 255, 255, 0.1);
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border: 1px solid rgba(138, 43, 226, 0.5);
 }

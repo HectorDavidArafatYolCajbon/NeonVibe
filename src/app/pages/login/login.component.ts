@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { CrearUsuarioDialogComponent } from '../crear-usuario-dialog/crear-usuario-dialog.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -13,12 +14,14 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   showPassword: boolean = false;
+  showPassword: boolean = false;
   loading: boolean = false;
 
   constructor(
     public dialog: MatDialog,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   togglePassword() {
@@ -27,7 +30,7 @@ export class LoginComponent {
 
   onSubmit() {
     if (!this.email || !this.password) {
-      alert('Por favor, ingresa email y contraseña.');
+      Swal.fire('Campos incompletos', 'Por favor, ingresa email y contraseña.', 'warning');
       return;
     }
 
@@ -56,6 +59,9 @@ export class LoginComponent {
         }
 
         // 🔍 Si no trae datos completos, validar token para obtener el usuario
+        console.log('Login exitoso:', response);
+
+        // Validar token y refrescar usuario
         this.authService.validateToken().subscribe({
           next: (user) => {
             console.log('👤 Usuario obtenido:', user);
@@ -88,7 +94,28 @@ export class LoginComponent {
             this.loading = false;
             this.router.navigate(['/']);
           },
+            console.error('Error al obtener usuario:', err);
+          },
         });
+
+        this.loading = false;
+
+        // Mostrar alerta de bienvenida
+        Swal.fire({
+          title: 'Bienvenido 👋',
+          text: 'Inicio de sesión exitoso',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        // Redirigir al carrito si venía de ahí
+        const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+        if (redirectTo) {
+          this.router.navigate([redirectTo]);
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       error: (error) => {
         console.error('❌ Error en login:', error);
@@ -97,6 +124,11 @@ export class LoginComponent {
           error.error?.message ||
           'Error al iniciar sesión. Verifica tus credenciales.';
         alert(message);
+      },
+        const message =
+          error.error?.message ||
+          'Error al iniciar sesión. Verifica tus credenciales.';
+        Swal.fire('Error', message, 'error');
       },
     });
   }
@@ -108,6 +140,8 @@ export class LoginComponent {
 
     dialogRef.afterClosed().subscribe(() => {
       console.log('El modal se cerró');
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log('El modal de registro se cerró:', result);
     });
   }
 }

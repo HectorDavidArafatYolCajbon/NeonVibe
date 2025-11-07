@@ -12,12 +12,17 @@
           <p>Talla: {{ item.talla || 'Única' }}</p>
 
           <!-- Mostrar precios con descuento si aplica -->
-          <p class="price">
-            <span *ngIf="item.descuento && item.descuento > 0" class="old">Q{{ item.oldPrice }}</span>
-            <span class="discounted">Q{{ item.precio_final }}</span>
-            <span *ngIf="item.descuento && item.descuento > 0" class="discount-badge">-{{ item.descuento }}%</span>
-          </p>
+          <div class="price-row">
+            <p class="price">
+              <span *ngIf="item.descuento && item.descuento > 0" class="old">Q{{ item.oldPrice | number:'1.2-2' }}</span>
+              <span class="discounted">Q{{ item.precio_final | number:'1.2-2' }}</span>
+              <span *ngIf="item.descuento && item.descuento > 0" class="discount-badge">-{{ item.descuento }}%</span>
+            </p>
+          </div>
         </div>
+
+        <!-- Botón eliminar: ahora es hijo directo de .cart-item para colocarlo en su propia columna -->
+        <button class="delete-btn" (click)="eliminar(item)" aria-label="Eliminar producto">🗑</button>
 
         <div class="item-controls">
           <button (click)="disminuir(item)">−</button>
@@ -28,8 +33,6 @@
         <div class="item-total">
           Q{{ item.cantidad * item.precio_final | number:'1.2-2' }}
         </div>
-
-        <button class="delete-btn" (click)="eliminar(item)">🗑</button>
       </div>
 
       <!-- 🔹 Botones inferiores -->
@@ -71,7 +74,7 @@
 <!-- 🧾 Compra exitosa -->
 <ng-template #successMsg>
   <div class="success-message">
-    <h2>✅ ¡Gracias por tu compra!</h2>
+    <h2> ¡Gracias por tu compra!</h2>
     <p>Tu pedido ha sido procesado correctamente.</p>
     <button class="continue-btn" (click)="continuarComprando()">Seguir comprando</button>
   </div>

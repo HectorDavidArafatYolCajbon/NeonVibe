@@ -6,6 +6,7 @@ import { ProductosService } from 'src/app/services/productos.service';
 import { CartService } from 'src/app/services/cart.service';
 import { FavoritesService } from 'src/app/services/favorites.service';
 import { Product } from 'src/app/models/product';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-zapatos-mujeres',
@@ -42,37 +43,48 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** 👟 Cargar zapatillas de mujer */
+  /** 👠 Cargar productos exclusivamente de MUJER */
   cargarZapatosMujer(): void {
     this.loading = true;
     this.productosService.getVariantes().subscribe({
       next: (data) => {
-        console.log('🟣 Variantes recibidas:', data);
+        // 🔹 Solo productos de género mujer y categoría calzado
+        const zapatosMujer = data.filter((v: any) => {
+          const nombre = v.producto?.nombre?.toLowerCase() || '';
+          const modelo = v.modelo?.toLowerCase() || '';
+          const genero = v.producto?.genero?.toLowerCase() || '';
+          const categoria = String(v.producto?.id_categoria || '');
 
-        // 🔹 Filtrar solo variantes que sean zapatillas de mujer
-        const variantesMujer = data.filter(
-          (v: any) =>
-            (v.producto?.genero?.toLowerCase() === 'mujer' ||
-              v.modelo?.toLowerCase().includes('mujer')) &&
-            (v.producto?.nombre?.toLowerCase().includes('zapatilla') ||
-              v.modelo?.toLowerCase().includes('zapatilla') ||
-              String(v.producto?.id_categoria) === '6')
-        );
+          return (
+            (genero === 'mujer' ||
+              nombre.includes('mujer') ||
+              modelo.includes('mujer')) &&
+            (nombre.includes('zapato') ||
+              modelo.includes('zapato') ||
+              nombre.includes('zapatilla') ||
+              modelo.includes('zapatilla') ||
+              categoria === '6')
+          );
+        });
 
         const agrupadas: any = {};
 
-        for (const v of variantesMujer) {
+        for (const v of zapatosMujer) {
           const idProducto = v.producto?.id_producto;
           if (!idProducto) continue;
 
-          // 🟣 Crear grupo del producto si no existe
+          const tieneImagen =
+            (v.imagen_url && !v.imagen_url.includes('Sin+Imagen')) ||
+            (Array.isArray(v.imagenes) &&
+              v.imagenes.some((img: any) => img?.url && !img.url.includes('Sin+Imagen')));
+          if (!tieneImagen) continue;
+
           if (!agrupadas[idProducto]) {
             agrupadas[idProducto] = {
               id: idProducto,
               name: v.producto?.nombre || v.modelo,
-              description: v.producto?.descripcion || 'Calzado deportivo para mujer',
-              color: v.color,
-              image: '', // se define luego
+              description: v.producto?.descripcion || 'Calzado femenino de estilo moderno',
+              image: v.imagen_url || v.imagenes?.[0]?.url,
               images: [],
               sizes: [],
               descuentos: [],
@@ -80,28 +92,15 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
             };
           }
 
-          // 🖼️ Agregar solo imágenes válidas (evita placeholders)
-          const nuevasImgs: string[] = [];
+          const nuevasImgs = [
+            v.imagen_url,
+            ...(v.imagenes?.map((i: any) => i.url) || [])
+          ].filter(Boolean);
 
-          if (v.imagen_url && !v.imagen_url.includes('Sin+Imagen')) {
-            nuevasImgs.push(v.imagen_url);
-          }
+          agrupadas[idProducto].images = [
+            ...new Set([...(agrupadas[idProducto].images || []), ...nuevasImgs])
+          ];
 
-          if (Array.isArray(v.imagenes)) {
-            nuevasImgs.push(
-              ...v.imagenes
-                .filter((i: any) => i?.url && !i.url.includes('Sin+Imagen'))
-                .map((i: any) => i.url)
-            );
-          }
-
-          if (nuevasImgs.length > 0) {
-            agrupadas[idProducto].images = [
-              ...new Set([...(agrupadas[idProducto].images || []), ...nuevasImgs])
-            ];
-          }
-
-          // 📏 Agregar tallas y precios (aunque no tengan imagen)
           agrupadas[idProducto].sizes.push({
             talla: v.talla,
             stock: v.stock?.stock ?? 0,
@@ -113,49 +112,35 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
           agrupadas[idProducto].precios.push(parseFloat(v.precio_final ?? v.precio_venta ?? 0));
         }
 
-        // 🔹 Convertir a array y calcular precios finales
-        this.products = Object.values(agrupadas)
-          .map((p: any) => {
-            const maxPrecio = Math.max(...p.precios);
-            const maxDesc = Math.max(...p.descuentos);
-            const minPrecio = Math.min(...p.precios);
+        this.products = Object.values(agrupadas).map((p: any) => {
+          const maxPrecio = Math.max(...p.precios);
+          const maxDesc = Math.max(...p.descuentos);
+          const minPrecio = Math.min(...p.precios);
+          return {
+            ...p,
+            descuento: maxDesc > 0 ? maxDesc : 0,
+            price: minPrecio,
+            oldPrice: maxDesc > 0 ? maxPrecio : minPrecio,
+            tieneRango: maxPrecio !== minPrecio
+          };
+        });
 
-            // 🔹 Asignar imagen principal (si no tiene, usar placeholder)
-            const imagenPrincipal =
-              p.images.length > 0
-                ? p.images[0]
-                : 'https://via.placeholder.com/400x400/eeeeee/888888?text=Sin+imagen+disponible';
-
-            return {
-              ...p,
-              image: imagenPrincipal,
-              descuento: maxDesc > 0 ? maxDesc : 0,
-              price: minPrecio,
-              oldPrice: maxDesc > 0 ? maxPrecio : minPrecio,
-              tieneRango: maxPrecio !== minPrecio
-            };
-          })
-          // ✅ Mantiene productos incluso si no tienen imágenes válidas
-          .filter((p: any) => Array.isArray(p.sizes) && p.sizes.length > 0);
-
-        console.log('✅ Zapatillas mujer agrupadas:', this.products);
         this.loading = false;
       },
       error: (err) => {
-        console.error('❌ Error al cargar zapatillas mujer:', err);
+        console.error('❌ Error al cargar zapatos de mujer:', err);
         this.loading = false;
       }
     });
   }
 
-  /** 🔹 Modal */
+  /** 🪞 Modal */
   openModal(product: Product) {
     this.selectedProduct = { ...product };
     this.activeImage = product.images?.[0] || product.image || 'https://via.placeholder.com/400x400?text=Sin+Imagen';
     this.selectedSize = '';
     this.selectedVarianteId = null;
     this.modalVisible = true;
-
     (this.selectedProduct as any).basePrice = product.price;
     (this.selectedProduct as any).baseOldPrice = product.oldPrice;
     (this.selectedProduct as any).baseDescuento = product.descuento;
@@ -167,7 +152,6 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
     this.selectedProduct = null;
     this.selectedSize = '';
     this.selectedVarianteId = null;
-    this.currentVariante = null;
   }
 
   nextImage() {
@@ -186,96 +170,48 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
       ];
   }
 
-  /** 🔹 Seleccionar talla (con animación de precio) */
   selectSize(size: any) {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
-
-    const basePrice = (this.selectedProduct as any).basePrice ?? 0;
-    const baseOld = (this.selectedProduct as any).baseOldPrice ?? 0;
-    const baseDesc = (this.selectedProduct as any).baseDescuento ?? 0;
-
-    const variante = (this.productosService.cachedVariantes || []).find(
+    const variante = (this.productosService.getCachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
         (v.talla || 'Única') === size.talla
     );
-
     if (variante) {
       this.selectedVarianteId = variante.id_variante;
-      this.currentVariante = variante;
-
-      const pv = parseFloat(variante.precio_venta ?? baseOld);
-      const desc = parseFloat(variante.descuento ?? baseDesc);
-      let pf = parseFloat(variante.precio_final ?? '0');
-
-      // Si no tiene descuento o descuento 0, mostrar solo el precio normal
-      if (!desc || desc <= 0) {
-        this.selectedProduct.price = pv;
-        this.selectedProduct.oldPrice = 0; // ← no mostrar
-        this.selectedProduct.descuento = 0;
-      } else {
-        // Si tiene descuento, calcular precio final si no viene
-        if (!pf || pf === pv) {
-          pf = parseFloat((pv * (1 - desc / 100)).toFixed(2));
-        }
-        this.selectedProduct.price = pf; // rojo (con descuento)
-        this.selectedProduct.oldPrice = pv; // gris tachado
-        this.selectedProduct.descuento = desc;
-      }
-
-      // Mantener imágenes
-      this.selectedProduct.images = (this.selectedProduct as any).baseImages || [];
-      this.activeImage = this.selectedProduct.images?.[0] ||
-        'https://via.placeholder.com/400x400?text=Sin+Imagen';
-
-      // 🔔 Animación visual del precio
+      this.selectedProduct.price = parseFloat(
+        variante.precio_final ?? variante.precio_venta ?? (this.selectedProduct as any).basePrice
+      );
+      this.selectedProduct.oldPrice = parseFloat(
+        variante.precio_venta ?? (this.selectedProduct as any).baseOldPrice
+      );
+      this.selectedProduct.descuento = parseFloat(variante.descuento ?? 0);
       const priceEl = document.querySelector('.modal-details .price') as HTMLElement;
       if (priceEl) {
         priceEl.classList.remove('price-change');
         void priceEl.offsetWidth;
         priceEl.classList.add('price-change');
       }
-    } else {
-      // Restaurar base
-      this.selectedProduct.price = basePrice;
-      this.selectedProduct.oldPrice = baseOld;
-      this.selectedProduct.descuento = baseDesc;
-      this.selectedVarianteId = null;
-      this.currentVariante = null;
     }
   }
 
-  // � Agregar al carrito
+  /** 🛒 Agregar al carrito */
   addToCart(): void {
-    // 🧩 Validar que el producto y talla estén definidos
-    if (!this.selectedProduct) {
-      alert('Error: no hay producto seleccionado.');
-      return;
-    }
-
+    if (!this.selectedProduct) return;
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla antes de agregar al carrito.');
+      this.toastModal('Selecciona una talla antes de agregar al carrito', 'warning');
       return;
     }
 
-    // 🧩 Validar que el arreglo sizes exista antes de buscar
     const selectedSizeData = this.selectedProduct.sizes?.find(
       (s: any) => s.talla === this.selectedSize
     );
-
-    if (!selectedSizeData) {
-      alert('Error: talla no encontrada o sin información de stock.');
+    if (!selectedSizeData || selectedSizeData.stock <= 0) {
+      this.toastModal('🚫 Este producto está agotado', 'error');
       return;
     }
 
-    const stockDisponible = selectedSizeData.stock ?? 0;
-    if (stockDisponible <= 0) {
-      alert('� Este producto está agotado.');
-      return;
-    }
-
-    // 🧩 Obtener carrito actual
     const currentCart = this.cartService.getCart();
     const existing = currentCart.find(
       (item: any) =>
@@ -284,8 +220,8 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
     );
 
     if (existing) {
-      if (existing.cantidad >= stockDisponible) {
-        alert(`⚠️ Solo hay ${stockDisponible} unidades disponibles.`);
+      if (existing.cantidad >= selectedSizeData.stock) {
+        this.toastModal(`Solo hay ${selectedSizeData.stock} unidades disponibles`, 'warning');
         return;
       }
       existing.cantidad++;
@@ -297,56 +233,88 @@ export class ZapatosMujeresComponent implements OnInit, OnDestroy {
         talla: this.selectedSize,
         image: this.activeImage,
         precio_final: this.selectedProduct.price,
+        oldPrice: this.selectedProduct.oldPrice,
+        descuento: this.selectedProduct.descuento,
         cantidad: 1,
-        stock: stockDisponible
+        stock: selectedSizeData.stock
       };
       this.cartService.addToCart(productToAdd);
     }
 
-    alert(`✅ ${this.selectedProduct.name} agregado a la bolsa`);
+    this.toastModal(`${this.selectedProduct.name} Agregar al Carrito 🛍️`, 'success');
     this.closeModal();
   }
 
-  ngOnDestroy(): void {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
-    }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
-
-  /** Agregar a favoritos */
+  /** ❤️ Agregar a favoritos */
   addToFavorites(): void {
-    if (!this.selectedProduct) return;
+    if (!this.isLoggedIn) {
+      this.closeModal();
+      this.toastModal('Debes iniciar sesión para agregar a favoritos', 'info');
+      return;
+    }
     if (!this.selectedSize || !this.selectedVarianteId) {
-      alert('Por favor selecciona una talla');
+      this.closeModal();
+      this.toastModal('Selecciona una talla antes de agregar a favoritos', 'warning');
       return;
     }
 
     this.favoritesService.addToFavorites({
       id_variante: this.selectedVarianteId,
-      name: this.selectedProduct.name,
+      name: this.selectedProduct?.name,
       talla: this.selectedSize,
       image: this.activeImage,
-      precio_final: this.selectedProduct.price
+      precio_final: this.selectedProduct?.price
     });
-    alert('✅ Producto agregado a favoritos');
+
+    this.toastModal('Agregado a tus favoritos 💗', 'success');
+    this.closeModal();
   }
 
-  /** Quitar de favoritos */
+  /** 💔 Quitar de favoritos */
   removeFromFavorites(): void {
     if (this.selectedVarianteId) {
       this.favoritesService.removeFromFavorites(this.selectedVarianteId, this.selectedSize);
-      alert('✅ Producto removido de favoritos');
+      this.toastModal('Eliminado de favoritos 💔', 'info');
+      this.closeModal();
     }
   }
 
-  /** Verificar si está en favoritos */
+  /** 🚪 Cerrar sesión */
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.toastModal('Sesión cerrada correctamente', 'info');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Error al cerrar sesión:', err);
+        this.toastModal('Error al cerrar sesión', 'error');
+      }
+    });
+  }
+
   isInFavorites(): boolean {
-    return this.selectedVarianteId ?
-      this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize) : false;
+    if (!this.selectedVarianteId) return false;
+    return this.favoritesService.isInFavorites(this.selectedVarianteId, this.selectedSize);
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) this.userSubscription.unsubscribe();
+  }
+
+  /** 🌑 Toast oscuro NeonVibe */
+  private toastModal(title: string, icon: 'success' | 'error' | 'info' | 'warning') {
+    Swal.fire({
+      icon,
+      title,
+      position: 'top',
+      toast: true,
+      background: '#000',
+      color: '#fff',
+      showConfirmButton: false,
+      timer: 1900,
+      backdrop: false,
+      customClass: { popup: 'neon-toast-dark' }
+    });
   }
 }

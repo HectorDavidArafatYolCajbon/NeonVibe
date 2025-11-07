@@ -53,6 +53,16 @@ export class CartService {
   /** 🧩 Agregar producto al carrito con validación de stock */
   addToCart(product: any): void {
     const cart = this.getCart();
+
+    // Normalizar campos numéricos y calcular precio original si viene con descuento
+    product.precio_final = parseFloat(product.precio_final) || 0;
+    product.descuento = parseFloat(product.descuento) || 0;
+
+    if (product.descuento > 0 && (product.oldPrice === undefined || product.oldPrice === null)) {
+      const factor = 1 - (product.descuento / 100);
+      product.oldPrice = factor > 0 ? parseFloat((product.precio_final / factor).toFixed(2)) : product.precio_final;
+    }
+
     const existing = cart.find(
       (p) => p.id_variante === product.id_variante && p.talla === product.talla
     );
@@ -64,6 +74,10 @@ export class CartService {
         return;
       }
       existing.cantidad++;
+      // Ensure existing item has pricing fields
+      existing.precio_final = existing.precio_final || product.precio_final;
+      existing.descuento = existing.descuento || product.descuento;
+      existing.oldPrice = existing.oldPrice || product.oldPrice;
     } else {
       // Validar stock inicial
       if (product.stock <= 0) {
