@@ -8,6 +8,15 @@
   align-items: center;
   padding: 2rem 1rem;
   box-sizing: border-box;
+
+  .form-header {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 /* 🔹 Título */
@@ -23,15 +32,49 @@ h2 {
 
 /* 🔹 Formulario de creación */
 .form-crear {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.8rem;
+  width: 90%;
+  max-width: 900px;
   background: #fff;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   border-radius: 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .form-group {
+      flex: 1;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+  }
+
+  .form-check {
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    input[type="checkbox"] {
+      width: auto;
+      min-width: auto;
+      margin: 0;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
 
   input,
   select {
@@ -67,14 +110,19 @@ h2 {
 }
 
 /* 🔹 Tabla */
-table {
+.table-container {
   width: 90%;
   max-width: 900px;
-  border-collapse: collapse;
-  background-color: #fff;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
 
   th {
     background-color: #000;
@@ -116,16 +164,49 @@ table {
 /* 🔹 Botones de acción */
 button {
   font-family: 'Poppins', sans-serif;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &.btn-primary {
+    background-color: #000;
+    color: #fff;
+    font-weight: 600;
+
+    &:hover {
+      background-color: #222;
+      transform: scale(1.05);
+    }
+  }
+
+  &.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+
+    &:hover {
+      background-color: #5a6268;
+      transform: scale(1.05);
+    }
+  }
+
+  &.btn-warning {
+    background-color: #ffc107;
+    color: #000;
+
+    &:hover {
+      background-color: #e0a800;
+      transform: scale(1.05);
+    }
+  }
 }
 
 /* Botón de editar */
 button.btn-editar {
   background-color: #007bff;
   color: #fff;
-  border: none;
   padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
@@ -256,27 +337,47 @@ button.btn-estado {
 
 /* 🔹 Responsive */
 @media (max-width: 768px) {
+  .usuarios-container {
+    padding: 1rem;
+  }
+
   .form-crear {
-    flex-direction: column;
-    align-items: stretch;
-
-    input,
-    select {
-      width: 100%;
-    }
-
-    button {
-      width: 100%;
-    }
-  }
-
-  table {
     width: 100%;
-    font-size: 0.9rem;
+    padding: 1rem;
+
+    .form-row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 
-  th,
-  td {
-    padding: 0.6rem;
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+
+    table {
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      padding: 0.6rem;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.3rem;
+    }
   }
+}
 }

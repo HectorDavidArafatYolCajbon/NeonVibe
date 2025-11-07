@@ -116,6 +116,17 @@ export class LoginComponent {
       error: (error) => {
         console.error('❌ Error en login:', error);
         this.loading = false;
+
+        if (error.message === 'CUENTA_INACTIVA') {
+          Swal.fire({
+            title: 'Cuenta Inactiva',
+            text: 'Tu cuenta está actualmente desactivada. Por favor, contacta con el administrador para reactivarla.',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+          });
+          return;
+        }
+
         const message = error.error?.message || 'Error al iniciar sesión. Verifica tus credenciales.';
         Swal.fire('Error', message, 'error');
       }

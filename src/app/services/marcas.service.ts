@@ -1,22 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry, tap, map } from 'rxjs/operators';
-
-export interface Marca {
-  id_marca: string;
-  nombre: string;
-  imagen: string;
-  descripcion: string;
-  categorias: string[];
-  destacada: boolean;
-}
+import { catchError, retry, map, tap } from 'rxjs/operators';
+import { Marca } from '../models/marca.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MarcasService {
-  private apiUrl = 'https://proyectoropa-ijsq.onrender.com/api/marcas';
+  private apiUrl = `${environment.apiUrl}/api/marcas`;
 
   constructor(private http: HttpClient) { }
 
@@ -24,53 +17,50 @@ export class MarcasService {
    * Obtiene todas las marcas disponibles
    */
   getMarcas(): Observable<Marca[]> {
-    return this.http.get<any[]>(this.apiUrl)
-      .pipe(
-        map(marcas => {
-          return marcas.map(marca => ({
-            ...marca,
-            // Si no hay categorías, asignamos un array con 'General'
-            categorias: Array.isArray(marca.categorias) ? marca.categorias : ['General'],
-            // Aseguramos que el id_marca sea string
-            id_marca: marca.id_marca.toString(),
-            // Valores por defecto para campos opcionales
-            descripcion: marca.descripcion || `Productos ${marca.nombre}`,
-            destacada: !!marca.destacada
-          }));
-        }),
-        tap((marcas: Marca[]) => {
-          console.log('Marcas procesadas:', marcas);
-        }),
-        retry(3),
-        catchError(this.handleError)
-      );
+    return this.http.get<Marca[]>(this.apiUrl).pipe(
+      map((response: any[]) => {
+        return response.map(item => ({
+          id_marca: item.id_marca,
+          nombre: item.nombre,
+          imagen: item.imagen || null
+        } as Marca));
+      }),
+      tap(marcas => console.log('Marcas cargadas:', marcas)),
+      retry(3),
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Obtiene una marca específica por su ID
-   */
+  // Obtener una marca por ID
   getMarcaById(id: number): Observable<Marca> {
-    return this.http.get<Marca>(`${this.apiUrl}/${id}`)
-      .pipe(
-        retry(3),
-        catchError(this.handleError)
-      );
+    return this.http.get<Marca>(`${this.apiUrl}/${id}`).pipe(
+      retry(3),
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Obtiene marcas filtradas por categoría
-   */
-  getMarcasByCategoria(categoria: string): Observable<Marca[]> {
-    return this.http.get<Marca[]>(`${this.apiUrl}/categoria/${categoria}`)
-      .pipe(
-        retry(3),
-        catchError(this.handleError)
-      );
+  // Crear una nueva marca
+  crearMarca(data: { nombre: string; imagen?: string }): Observable<Marca> {
+    return this.http.post<Marca>(`${this.apiUrl}/create`, data).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Manejo centralizado de errores HTTP
-   */
+  // Actualizar una marca
+  actualizarMarca(id: number, data: { nombre?: string; imagen?: string }): Observable<Marca> {
+    return this.http.put<Marca>(`${this.apiUrl}/update/${id}`, data).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Eliminar una marca
+  eliminarMarca(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Manejo de errores
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ha ocurrido un error desconocido';
 
