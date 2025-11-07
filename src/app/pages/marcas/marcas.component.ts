@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { Subscription, finalize, catchError, of, switchMap } from 'rxjs';
-import { MarcasService, Marca } from 'src/app/services/marcas.service';
+import { MarcasService } from 'src/app/services/marcas.service';
+import { Marca } from 'src/app/models/marca.model';
 import { ProductosService } from 'src/app/services/productos.service';
 import { Product } from 'src/app/models/product';
 
