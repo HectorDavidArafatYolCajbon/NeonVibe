@@ -1,22 +1,184 @@
-.category-container {
-  text-align: center;
+.marcas-container {
   padding: 4rem 2rem;
   font-family: 'Poppins', sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
+  &.loading {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
-  p {
-    color: #444;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    p {
+      color: #444;
+      font-size: 1.1rem;
+    }
+  }
+
+  .categorias-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+
+    button {
+      padding: 0.5rem 1.5rem;
+      border: 2px solid #000;
+      border-radius: 25px;
+      background: transparent;
+      color: #000;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #000;
+        color: #fff;
+      }
+
+      &.active {
+        background: #000;
+        color: #fff;
+      }
+    }
+  }
+
+  .marcas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .marca-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    &.destacada {
+      border: 2px solid #ffd700;
+    }
+
+    .marca-imagen {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover img {
+        transform: scale(1.05);
+      }
+    }
+
+    .marca-info {
+      padding: 1.5rem;
+
+      h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+      }
+
+      .categorias {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        span {
+          font-size: 0.8rem;
+          padding: 0.25rem 0.75rem;
+          background: #f0f0f0;
+          border-radius: 15px;
+          color: #444;
+        }
+      }
+    }
+  }
+
+  .loading-spinner {
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 2rem;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    p {
+      color: #666;
+    }
+  }
+
+  .error-message {
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 2rem;
+
+    p {
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.5rem 1.5rem;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #333;
+      }
+    }
   }
 
   .back-btn {
+    display: block;
+    margin: 2rem auto;
     background-color: #000;
     color: #fff;
     border: none;
@@ -36,4 +198,161 @@
       transform: scale(0.98);
     }
   }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Vista de productos
+.marca-productos-view {
+  width: 100%;
+
+  .marca-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+
+    .back-btn {
+      align-self: flex-start;
+    }
+
+    .marca-info {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+
+      img {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+      }
+
+      .text {
+        h2 {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: #666;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+
+  .productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+
+  .product-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-image {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .discount {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #ff4444;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+      }
+    }
+
+    .product-info {
+      padding: 1.5rem;
+
+      h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      p {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .price-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        .price {
+          font-size: 1.3rem;
+          font-weight: 700;
+          
+          &.has-discount {
+            color: #ff4444;
+          }
+        }
+
+        .old-price {
+          color: #999;
+          text-decoration: line-through;
+          font-size: 1.1rem;
+        }
+
+        .price-range {
+          font-size: 0.8rem;
+          color: #666;
+          font-style: italic;
+        }
+      }
+    }
+  }
+
+  .no-products {
+    text-align: center;
+    padding: 3rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    margin-top: 2rem;
+
+    p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.hidden {
+  display: none;
 }

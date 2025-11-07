@@ -187,7 +187,7 @@ export class OfertasComponent implements OnInit, OnDestroy {
   const baseDesc = (this.selectedProduct as any).baseDescuento ?? 0;
 
   // ✅ Buscar variante exacta por talla
-  const variante = (this.productosService.cachedVariantes || []).find(
+  const variante = (this.productosService.getCachedVariantes || []).find(
     (v: any) =>
       v.producto?.id_producto === this.selectedProduct?.id &&
       (v.talla || 'Única') === size.talla

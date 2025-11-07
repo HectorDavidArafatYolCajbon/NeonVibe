@@ -159,7 +159,7 @@ export class PantalonesComponent implements OnInit, OnDestroy {
     if (!this.selectedProduct) return;
     this.selectedSize = size.talla;
 
-    const variante = (this.productosService.cachedVariantes || []).find(
+    const variante = (this.productosService.getCachedVariantes || []).find(
       (v: any) =>
         v.producto?.id_producto === this.selectedProduct?.id &&
         v.talla === size.talla
@@ -241,6 +241,7 @@ export class PantalonesComponent implements OnInit, OnDestroy {
   /** ❤️ Favoritos */
   addToFavorites(): void {
     if (!this.isLoggedIn) {
+      this.closeModal();
       this.toastModal('Debes iniciar sesión para agregar a favoritos', 'info');
       return;
     }

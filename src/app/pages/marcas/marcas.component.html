@@ -1,9 +1,110 @@
-<div class="category-container">
-  <h1>MARCAS</h1>
-  <p>Aca se mostraran las marcas.</p>
+<div class="marcas-container" [class.loading]="loading" [class.marca-detail]="marcaSeleccionada">
+  <!-- Vista de marcas -->
+  <div class="marcas-view" [class.hidden]="marcaSeleccionada">
+    <!-- Header -->
+    <div class="header">
+      <h1>Nuestras Marcas</h1>
+      <p>Descubre las mejores marcas deportivas y de moda</p>
+    </div>
+
+    <!-- Filtros de categorías -->
+    <div class="categorias-filter">
+      <button *ngFor="let categoria of categorias"
+              [class.active]="categoriaSeleccionada === categoria"
+              (click)="filtrarPorCategoria(categoria)">
+        {{ categoria }}
+      </button>
+    </div>
+
+    <!-- Grid de marcas -->
+    <div class="marcas-grid">
+      <!-- Loading spinner -->
+      <div class="loading-spinner" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Cargando marcas...</p>
+      </div>
+
+      <!-- Error message -->
+      <div class="error-message" *ngIf="error">
+        <p>{{ error }}</p>
+        <button (click)="cargarMarcas()">Reintentar</button>
+      </div>
+
+      <!-- Marcas -->
+      <div class="marca-card" *ngFor="let marca of marcasFiltradas"
+          [class.destacada]="marca.destacada"
+          (click)="verDetalle(marca)">
+        <div class="marca-imagen">
+          <img [src]="marca.imagen" [alt]="marca.nombre">
+        </div>
+        <div class="marca-info">
+          <h3>{{ marca.nombre }}</h3>
+          <p>{{ marca.descripcion }}</p>
+          <div class="categorias">
+            <span *ngFor="let cat of marca.categorias">{{ cat }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de productos por marca -->
+  <div class="marca-productos-view" *ngIf="marcaSeleccionada">
+    <!-- Header con info de marca -->
+    <div class="marca-header">
+      <button class="back-btn" (click)="marcaSeleccionada = null">
+        ⬅ Volver a marcas
+      </button>
+      <div class="marca-info">
+        <img [src]="marcaSeleccionada.imagen" [alt]="marcaSeleccionada.nombre">
+        <div class="text">
+          <h2>{{ marcaSeleccionada.nombre }}</h2>
+          <p>{{ marcaSeleccionada.descripcion }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading spinner para productos -->
+    <div class="loading-spinner" *ngIf="loadingProducts">
+      <div class="spinner"></div>
+      <p>Cargando productos...</p>
+    </div>
+
+    <!-- Grid de productos -->
+    <div class="productos-grid" *ngIf="!loadingProducts && productos.length > 0">
+      <div class="product-card" *ngFor="let producto of productos">
+        <div class="product-image">
+          <img [src]="producto.image" [alt]="producto.name">
+          <span class="discount" *ngIf="producto.descuento">
+            -{{ producto.descuento }}%
+          </span>
+        </div>
+        <div class="product-info">
+          <h3>{{ producto.name }}</h3>
+          <p>{{ producto.description }}</p>
+          <div class="price-container">
+            <span class="price" [class.has-discount]="!!producto.descuento">
+              Q{{ producto.price | number:'1.0-0' }}
+            </span>
+            <span class="old-price" *ngIf="producto.oldPrice">
+              Q{{ producto.oldPrice | number:'1.0-0' }}
+            </span>
+            <span class="price-range" *ngIf="producto.tieneRango">
+              + precios disponibles
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensaje sin productos -->
+    <div class="no-products" *ngIf="!loadingProducts && productos.length === 0">
+      <p>No hay productos disponibles para esta marca.</p>
+    </div>
+  </div>
 
   <!-- Botón para regresar al Home -->
-  <button class="back-btn" routerLink="/">
+  <button class="back-btn" routerLink="/" *ngIf="!marcaSeleccionada">
     ⬅ Volver al inicio
   </button>
 </div>
