@@ -1,0 +1,50 @@
+<div class="ventas-dia-wrapper" *ngIf="!error">
+  <div class="header-row">
+    <h3>🗓️ Ventas del día</h3>
+    <div class="filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" [formControl]="fechaControl" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <button class="btn-refresh" (click)="filtrarPorFecha()" [disabled]="cargando">Filtrar</button>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="loading">Cargando...</div>
+
+  <div class="tabla-dia" *ngIf="lineasDia.length && !cargando">
+    <table>
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Usuario</th>
+          <th>Variante</th>
+          <th>Talla</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let l of lineasDia">
+          <td>{{ l.hora }}</td>
+          <td>{{ l.usuario || '—' }}</td>
+          <td>{{ l.variante }}</td>
+          <td>{{ l.talla }}</td>
+          <td>{{ l.cantidad }}</td>
+          <td>Q{{ l.unit | number:'1.2-2' }}</td>
+          <td>Q{{ l.total | number:'1.2-2' }}</td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="6" class="label">Total del Día:</td>
+          <td class="total">Q{{ totalDia | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="mock-banner" *ngIf="usoMock">(Datos de ejemplo - backend no disponible)</div>
+  </div>
+  <div *ngIf="!lineasDia.length && !cargando" class="empty">Sin ventas para esta fecha.</div>
+</div>
+<div *ngIf="error" class="error">{{ error }}</div>

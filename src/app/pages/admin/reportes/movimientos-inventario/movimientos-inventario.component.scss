@@ -1,0 +1,72 @@
+.movimientos-inventario-wrapper {
+  padding: 20px;
+
+  .filtros-container {
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+
+    .filtros-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      mat-form-field {
+        min-width: 200px;
+      }
+
+      .botones-filtro {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+
+        button {
+          height: 36px;
+        }
+      }
+    }
+  }
+
+  .tabla-container {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: auto;
+
+    table {
+      width: 100%;
+
+      th {
+        background: #f5f5f5;
+        font-weight: 500;
+        color: rgba(0,0,0,0.87);
+      }
+
+      td {
+        &.mat-column-fecha {
+          white-space: nowrap;
+        }
+
+        &.mat-column-cantidad,
+        &.mat-column-precioUnitario,
+        &.mat-column-stockAntes,
+        &.mat-column-stockDespues {
+          text-align: right;
+        }
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+      }
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+}

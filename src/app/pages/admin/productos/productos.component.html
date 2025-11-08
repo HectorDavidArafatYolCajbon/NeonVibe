@@ -1,6 +1,7 @@
 <div class="productos-container">
   <div class="topbar">
     <h2>🛍️ Gestión de Productos</h2>
+    <!-- Totales a la derecha -->
     <div class="totals-header">
       <div class="total-card costo">
         <span>Costo total inventario</span>
@@ -26,11 +27,13 @@
     </div>
   </div>
 
-<!-- 🎯 Botón para abrir modal -->
-<button class="btn-crear-producto" (click)="editandoProducto = false; productoSeleccionado = undefined; modalAbierto = true">
-  <i class="fas fa-plus"></i>
-  Crear Nuevo Producto
-</button>  <!-- 🎭 Modal de producto -->
+  <!-- 🎯 Botón para abrir modal -->
+  <button class="btn-crear-producto" (click)="editandoProducto = false; productoSeleccionado = undefined; modalAbierto = true">
+    <i class="fas fa-plus"></i>
+    Crear Nuevo Producto
+  </button>
+
+  <!-- 🎭 Modal de producto -->
   <app-modal-producto
     *ngIf="modalAbierto"
     [marcas]="marcas"

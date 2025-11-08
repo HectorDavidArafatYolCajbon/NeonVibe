@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-reportes',
@@ -39,8 +40,28 @@ export class ReportesComponent {
     }
   ];
 
+  constructor(private router: Router) {}
+
   seleccionar(accion: string) {
-    // Placeholder: posteriormente se conectará con carga de datos/gráficos
-    console.log('Seleccionado reporte:', accion);
+    switch (accion) {
+      case 'ventas-mes':
+        this.router.navigate(['/admin/reportes/ventas-mes']);
+        break;
+      case 'ganancias-mes':
+        this.router.navigate(['/admin/reportes/ganancias-mes']);
+        break;
+        this.router.navigate(['/admin/reportes/ganancias-mes']);
+        break;
+      case 'ventas-dia':
+        this.router.navigate(['/admin/reportes/ventas-dia']);
+        break;
+      case 'mov-inventario':
+        this.router.navigate(['/admin/reportes/movimientos-inventario']);
+        break;
+      case 'mov-ventas':
+        this.router.navigate(['/admin/reportes/ventas-mes']);
+        break;
+      // Otros reportes podrán navegar a sus respectivas rutas en el futuro
+    }
   }
 }

@@ -1,0 +1,54 @@
+.movimientos-ventas-wrapper {
+  padding: 20px;
+
+  .filtros-container {
+    margin-bottom: 20px;
+
+    .filtros-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .botones-filtro {
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+
+  .tabla-container {
+    margin-top: 20px;
+
+    table {
+      width: 100%;
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+}
+
+// Estilos responsivos
+@media screen and (max-width: 768px) {
+  .movimientos-ventas-wrapper {
+    .filtros-container {
+      .filtros-row {
+        flex-direction: column;
+        align-items: stretch;
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        .botones-filtro {
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+}
