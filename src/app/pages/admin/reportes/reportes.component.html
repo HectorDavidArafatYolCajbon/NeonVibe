@@ -1,0 +1,18 @@
+<div class="reportes-container">
+  <h2>📊 Reportes</h2>
+
+  <div class="acciones-grid">
+    <button class="accion-card" *ngFor="let a of acciones" (click)="seleccionar(a.key)">
+      <i class="material-icons">{{ a.icono }}</i>
+      <div class="info">
+        <strong>{{ a.titulo }}</strong>
+        <span>{{ a.descripcion }}</span>
+      </div>
+      <span class="cta">Ver</span>
+    </button>
+  </div>
+
+  <div class="placeholder">
+    <p>Selecciona un reporte para visualizar el gráfico o detalle.</p>
+  </div>
+</div>

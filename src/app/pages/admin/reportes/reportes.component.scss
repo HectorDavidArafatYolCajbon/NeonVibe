@@ -1,0 +1,59 @@
+.reportes-container {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  background: #f8f8f8;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > * { width: 90%; max-width: 1200px; }
+}
+
+h2 { margin-bottom: 1rem; font-weight: 700; }
+
+.acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.accion-card {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.accion-card:hover {
+  transform: translateY(-2px);
+  border-color: #000;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.accion-card i.material-icons {
+  font-size: 1.75rem;
+  color: #000;
+}
+
+.accion-card .info { display: flex; flex-direction: column; align-items: flex-start; }
+.accion-card .info strong { font-size: 1rem; }
+.accion-card .info span { font-size: .85rem; color: #666; }
+
+.accion-card .cta { margin-left: auto; color: #000; font-weight: 600; }
+
+.placeholder {
+  margin-top: 1.5rem;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #555;
+}

@@ -24,12 +24,14 @@ export class AuthService {
   login(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiBase}/usuarios/login`, { email, password }).pipe(
       tap((response: any) => {
-        // Verificar estado del usuario
-        if (response.user?.estado === false || response?.estado === false) {
-          throw new Error('CUENTA_INACTIVA');
+        console.log('Respuesta del login:', response); // Para debugging
+
+        // Verificar el estado del usuario
+        if (response.estado === false) {
+          throw new Error('CUENTA_DESACTIVADA');
         }
 
-        // Guardar token primero
+        // Solo guardar token si la cuenta está activa
         if (response.token) {
           localStorage.setItem(this.tokenKey, response.token);
         }

@@ -31,7 +31,7 @@ export class ProductsGridComponent implements OnInit {
 
   private loadProducts(): void {
     this.loading = true;
-    this.productosService.getVariantes().subscribe({
+    this.productosService.getVariantes(true).subscribe({
       next: (data) => {
         this.products = data.map((p: any) => ({
           id: p.id_variante,

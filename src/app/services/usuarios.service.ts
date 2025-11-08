@@ -48,7 +48,14 @@ export class UsuariosService {
   }
 
   /** Cambiar estado de usuario */
+  actualizarEstadoUsuario(id: number, estado: boolean): Observable<any> {
+    return this.http.put(
+      `${this.usuariosUrl}/${id}/estado`,
+      { estado },
+      { headers: this.headers() }
+    );
+  }
   cambiarEstado(id: number, estado: boolean): Observable<any> {
-    return this.http.patch(`${this.usuariosUrl}/${id}`, { estado }, { headers: this.headers() });
+    return this.http.put(`${this.usuariosUrl}/${id}/estado`, { estado }, { headers: this.headers() });
   }
 }

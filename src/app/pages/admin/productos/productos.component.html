@@ -1,5 +1,17 @@
 <div class="productos-container">
-  <h2>🛍️ Gestión de Productos</h2>
+  <div class="topbar">
+    <h2>🛍️ Gestión de Productos</h2>
+    <div class="totals-header">
+      <div class="total-card costo">
+        <span>Costo total inventario</span>
+        <strong>Q{{ totalCostoInventarioFiltrado | number: '1.2-2' }}</strong>
+      </div>
+      <div class="total-card venta">
+        <span>Venta total inventario</span>
+        <strong>Q{{ totalVentaInventarioFiltrado | number: '1.2-2' }}</strong>
+      </div>
+    </div>
+  </div>
 
   <!-- 🔍 Buscador elegante -->
   <div class="busqueda">
@@ -14,168 +26,83 @@
     </div>
   </div>
 
-  <!-- 🧾 Formulario de creación -->
-  <div class="form-crear">
-    <h3>{{ editandoProducto ? '✏️ Editar Producto' : '➕ Crear Nuevo Producto' }}</h3>
-
-    <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nombre">Nombre del producto*</label>
-          <input
-            id="nombre"
-            formControlName="nombre"
-            type="text"
-            placeholder="Nombre del producto" />
-          <small class="error-message" *ngIf="mostrarError('nombre')">
-            {{ mostrarError('nombre') }}
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="descripcion">Descripción*</label>
-          <input
-            id="descripcion"
-            formControlName="descripcion"
-            type="text"
-            placeholder="Descripción detallada" />
-          <small class="error-message" *ngIf="mostrarError('descripcion')">
-            {{ mostrarError('descripcion') }}
-          </small>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="genero">Género*</label>
-          <select id="genero" formControlName="genero">
-            <option value="">Seleccione género</option>
-            <option value="Hombre">Hombre</option>
-            <option value="Mujer">Mujer</option>
-            <option value="Unisex">Unisex</option>
-          </select>
-          <small class="error-message" *ngIf="mostrarError('genero')">
-            {{ mostrarError('genero') }}
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="id_marca">Marca*</label>
-          <select id="id_marca" formControlName="id_marca">
-            <option [ngValue]="0">Seleccione marca</option>
-            <option *ngFor="let marca of marcas" [ngValue]="marca.id_marca">
-              {{marca.nombre}}
-            </option>
-          </select>
-          <small class="error-message" *ngIf="mostrarError('id_marca')">
-            {{ mostrarError('id_marca') }}
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="id_categoria">Categoría*</label>
-          <select id="id_categoria" formControlName="id_categoria">
-            <option [ngValue]="0">Seleccione categoría</option>
-            <option *ngFor="let cat of categorias" [ngValue]="cat.id_categoria">
-              {{cat.nombre}}
-            </option>
-          </select>
-          <small class="error-message" *ngIf="mostrarError('id_categoria')">
-            {{ mostrarError('id_categoria') }}
-          </small>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="precio">Precio*</label>
-          <input
-            id="precio"
-            formControlName="precio"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Precio" />
-          <small class="error-message" *ngIf="mostrarError('precio')">
-            {{ mostrarError('precio') }}
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="stock">Stock*</label>
-          <input
-            id="stock"
-            formControlName="stock"
-            type="number"
-            min="0"
-            placeholder="Stock disponible" />
-          <small class="error-message" *ngIf="mostrarError('stock')">
-            {{ mostrarError('stock') }}
-          </small>
-        </div>
-      </div>
-
-      <div class="form-row file-upload">
-        <label>
-          <input type="file" (change)="onImageSelected($event)" accept="image/*" multiple />
-          <span>📸 Seleccionar imágenes</span>
-        </label>
-        <div class="preview-images" *ngIf="selectedImages.length > 0">
-          <div class="image-preview" *ngFor="let img of selectedImages; let i = index">
-            <img [src]="img.preview" alt="Preview" />
-            <button type="button" class="remove-image" (click)="removeImage(i)">❌</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-clear" (click)="limpiarFormulario()">
-          🗑️ Limpiar
-        </button>
-        <button
-          type="submit"
-          class="btn-submit"
-          [disabled]="productoForm.invalid || cargando">
-          {{ editandoProducto ? '✏️ Actualizar' : '➕ Crear Producto' }}
-        </button>
-      </div>
-    </form>
-  </div>
+<!-- 🎯 Botón para abrir modal -->
+<button class="btn-crear-producto" (click)="editandoProducto = false; productoSeleccionado = undefined; modalAbierto = true">
+  <i class="fas fa-plus"></i>
+  Crear Nuevo Producto
+</button>  <!-- 🎭 Modal de producto -->
+  <app-modal-producto
+    *ngIf="modalAbierto"
+    [marcas]="marcas"
+    [categorias]="categorias"
+    [editMode]="editandoProducto"
+    [existingProduct]="productoSeleccionado"
+    [existingVariantes]="productoSeleccionado?.variantes || []"
+    (productoGuardado)="cargarProductos()"
+    (cerrarModal)="modalAbierto = false; editandoProducto = false; productoSeleccionado = undefined">
+  </app-modal-producto>
 
   <!-- ⏳ Estado de carga -->
   <p *ngIf="cargando">Cargando productos...</p>
 
-  <!-- 📋 Tabla -->
-  <table *ngIf="!cargando && filtrados.length > 0; else sinProductos">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Género</th>
-        <th>Estado</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of filtrados">
-        <td>{{ p.id_producto }}</td>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.descripcion }}</td>
-        <td>{{ p.genero || '—' }}</td>
-        <td>
-          <span [class.activo]="p.activo" [class.inactivo]="!p.activo">
-            {{ p.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-        <td>
-          <button (click)="toggleEstado(p)">
-            {{ p.activo ? 'Desactivar' : 'Activar' }}
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- 📋 Tabla Responsiva -->
+  <div class="table-container" *ngIf="!cargando && filtrados.length > 0; else sinProductos">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-id">ID</th>
+          <th class="col-nombre">Nombre</th>
+          <th class="col-descripcion">Descripción</th>
+          <th class="col-genero">Género</th>
+          <th class="col-stock">Inventario</th>
+          <th class="col-precio-venta">Venta</th>
+          <th class="col-precio-costo">Costo</th>
+          <th class="col-descuento">Desc.</th>
+          <th class="col-estado">Estado</th>
+          <th class="col-accion">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of filtrados">
+          <td class="col-id">{{ p.id_producto }}</td>
+          <td class="col-nombre" [title]="p.nombre">
+            <div class="truncate">{{ p.nombre }}</div>
+          </td>
+          <td class="col-descripcion" [title]="p.descripcion">
+            <div class="truncate">{{ p.descripcion }}</div>
+          </td>
+          <td class="col-genero">{{ p.genero || '—' }}</td>
+          <td class="col-stock">
+            <div class="stock-info">
+              <div *ngFor="let item of (getStockTotal(p) || '').split(' | ')" class="stock-item">
+                {{ item || 'N/A' }}
+              </div>
+            </div>
+          </td>
+          <td class="col-precio-venta">Q{{ getPrecioPromedio(p, 'venta') ? (getPrecioPromedio(p, 'venta') | number:'1.2-2') : 'N/A' }}</td>
+          <td class="col-precio-costo">Q{{ getPrecioPromedio(p, 'costo') ? (getPrecioPromedio(p, 'costo') | number:'1.2-2') : 'N/A' }}</td>
+          <td class="col-descuento" [class.has-discount]="getDescuentoPromedio(p) > 0">
+            {{ getDescuentoPromedio(p) || 0 }}%
+          </td>
+          <td class="col-estado">
+            <span class="estado-badge" [class.activo]="p.activo" [class.inactivo]="!p.activo">
+              {{ p.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="col-accion">
+            <button class="btn-edit" (click)="editarProducto(p)" [title]="'Editar producto ' + p.nombre">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>Editar</span>
+            </button>
+            <button class="btn-toggle" (click)="toggleEstado(p)" [class.btn-activar]="!p.activo" [title]="p.activo ? 'Desactivar producto' : 'Activar producto'">
+              <i class="fa" [ngClass]="p.activo ? 'fa-ban' : 'fa-check'"></i>
+              <span>{{ p.activo ? 'Desactivar' : 'Activar' }}</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <!-- 🚫 Sin productos -->
   <ng-template #sinProductos>

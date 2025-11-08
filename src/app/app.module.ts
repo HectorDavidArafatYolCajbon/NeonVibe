@@ -19,9 +19,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { LoginComponent } from './pages/login/login.component';
+import { ModalProductoComponent } from './pages/admin/productos/modal-producto.component';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DisenoSportComponent } from './pages/diseno-sport/diseno-sport.component';
 import { AccesoriosSportComponent } from './pages/accesorios-sport/accesorios-sport.component';
 import { DeLoNuevoEnModaComponent } from './pages/de-lo-nuevo-en-moda/de-lo-nuevo-en-moda.component';
@@ -39,12 +48,13 @@ import { BlusasComponent } from './pages/mujeres/blusas/blusas.component';
 import { ZapatosMujeresComponent } from './pages/mujeres/zapatos-mujeres/zapatos-mujeres.component';
 import { CarritoComponent } from './pages/carrito/carrito.component';
 import { FavoritosComponent } from './pages/favoritos/favoritos.component';
-import { CrearUsuarioDialogComponent } from './pages/crear-usuario-dialog/crear-usuario-dialog.component';
+import { CrearUsuarioDialogComponent } from './pages/admin/usuarios/crear-usuario-dialog/crear-usuario-dialog.component';
+import { CrearUsuarioDialogComponent as CrearUsuarioDialogPublicComponent } from './pages/crear-usuario-dialog/crear-usuario-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ReactiveFormsModule } from '@angular/forms';
 import { AdminComponent } from './pages/admin/admin.component';
 import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component';
 import { ProductosComponent } from './pages/admin/productos/productos.component';
+import { ReportesComponent } from './pages/admin/reportes/reportes.component';
 
 
 @NgModule({
@@ -74,9 +84,12 @@ import { ProductosComponent } from './pages/admin/productos/productos.component'
     CarritoComponent,
     FavoritosComponent,
     CrearUsuarioDialogComponent,
+    CrearUsuarioDialogPublicComponent,
     AdminComponent,
     UsuariosComponent,
     ProductosComponent,
+    ModalProductoComponent,
+  ReportesComponent,
 
  ],
   imports: [
@@ -88,10 +101,18 @@ import { ProductosComponent } from './pages/admin/productos/productos.component'
     MatMenuModule,
     MatIconModule,
     MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatTableModule,
+    MatTooltipModule,
+    MatPaginatorModule,
     HttpClientModule,
     AppRoutingModule,
     FormsModule,
-    MatDialogModule,  // Agregar MatDialogModule aquí
+    MatDialogModule,
     ReactiveFormsModule,
   ],
   providers: [],
