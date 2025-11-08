@@ -4,6 +4,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
+
+// Chart.js
+import { NgChartsModule } from 'ng2-charts';
+import { Chart } from 'chart.js';
+import { registerables } from 'chart.js';
 import { AppComponent } from './app.component';
 
 // Importa tus componentes
@@ -27,6 +32,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { LoginComponent } from './pages/login/login.component';
 import { ModalProductoComponent } from './pages/admin/productos/modal-producto.component';
 
@@ -55,6 +62,12 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component';
 import { ProductosComponent } from './pages/admin/productos/productos.component';
 import { ReportesComponent } from './pages/admin/reportes/reportes.component';
+import { VentasDiaComponent } from './pages/admin/reportes/ventas-dia/ventas-dia.component';
+import { MovimientosInventarioComponent } from './pages/admin/reportes/movimientos-inventario/movimientos-inventario.component';
+import { MovimientosVentasComponent } from './pages/admin/reportes/movimientos-ventas/movimientos-ventas.component';
+import { VentasMesComponent } from './pages/admin/reportes/ventas-mes/ventas-mes.component';
+import { GananciasMesComponent } from './pages/admin/reportes/ganancias-mes/ganancias-mes.component';
+import { CommonModule } from '@angular/common';
 
 
 @NgModule({
@@ -89,12 +102,17 @@ import { ReportesComponent } from './pages/admin/reportes/reportes.component';
     UsuariosComponent,
     ProductosComponent,
     ModalProductoComponent,
-  ReportesComponent,
-
- ],
+    ReportesComponent,
+    VentasDiaComponent,
+    MovimientosInventarioComponent,
+    VentasMesComponent,
+    GananciasMesComponent,
+    MovimientosVentasComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CommonModule,
     // Angular Material
     MatToolbarModule,
     MatButtonModule,
@@ -109,13 +127,20 @@ import { ReportesComponent } from './pages/admin/reportes/reportes.component';
     MatTableModule,
     MatTooltipModule,
     MatPaginatorModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     HttpClientModule,
     AppRoutingModule,
     FormsModule,
     MatDialogModule,
     ReactiveFormsModule,
+    NgChartsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+    Chart.register(...registerables);
+  }
+}

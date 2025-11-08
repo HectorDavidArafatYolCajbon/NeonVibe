@@ -13,15 +13,6 @@
       <button class="btn-close" (click)="cerrar()">×</button>
     </div>
 
-    <!-- Barra Totales (visible solo en Paso 2) -->
-    <div class="totales-sticky" *ngIf="pasoActual === 2">
-      <div class="totales-inner">
-        <div class="item"><span>Costo total</span><strong>Q{{ totalCostoConFormulario | number:'1.2-2' }}</strong></div>
-        <div class="item"><span>Venta total</span><strong>Q{{ totalVentaConFormulario | number:'1.2-2' }}</strong></div>
-        <div class="item" *ngIf="variantes.length > 0"><span>Valor costo inventario</span><strong>Q{{ totalCostoInventarioConFormulario | number:'1.2-2' }}</strong></div>
-        <div class="item" *ngIf="variantes.length > 0"><span>Valor venta inventario</span><strong>Q{{ totalVentaInventarioConFormulario | number:'1.2-2' }}</strong></div>
-      </div>
-    </div>
 
     <!-- Paso 1: Producto -->
     <div class="modal-body" *ngIf="pasoActual === 1">

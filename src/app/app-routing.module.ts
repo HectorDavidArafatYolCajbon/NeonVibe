@@ -29,6 +29,11 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component'; // 👈 agregado
 import { ProductosComponent } from './pages/admin/productos/productos.component';
 import { ReportesComponent } from './pages/admin/reportes/reportes.component';
+import { VentasDiaComponent } from './pages/admin/reportes/ventas-dia/ventas-dia.component';
+import { MovimientosInventarioComponent } from './pages/admin/reportes/movimientos-inventario/movimientos-inventario.component';
+import { MovimientosVentasComponent } from './pages/admin/reportes/movimientos-ventas/movimientos-ventas.component';
+import { VentasMesComponent } from './pages/admin/reportes/ventas-mes/ventas-mes.component';
+import { GananciasMesComponent } from './pages/admin/reportes/ganancias-mes/ganancias-mes.component';
 
 const routes: Routes = [
   // 🔹 Página de inicio
@@ -75,6 +80,11 @@ const routes: Routes = [
     children: [
       { path: 'usuarios', component: UsuariosComponent, title: 'Gestión de Usuarios' },
       { path: 'reportes', component: ReportesComponent, title: 'Reportes' },
+      { path: 'reportes/ventas-dia', component: VentasDiaComponent, title: 'Ventas del día' },
+      { path: 'reportes/movimientos-inventario', component: MovimientosInventarioComponent, title: 'Movimientos de Inventario' },
+      { path: 'reportes/movimientos-ventas', component: MovimientosVentasComponent, title: 'Movimientos de Ventas' },
+      { path: 'reportes/ventas-mes', component: VentasMesComponent, title: 'Ventas por Mes' },
+      { path: 'reportes/ganancias-mes', component: GananciasMesComponent, title: 'Ganancias por Mes' },
     ],
   },
 

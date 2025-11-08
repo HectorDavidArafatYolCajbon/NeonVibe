@@ -14,24 +14,7 @@
   <div class="swiper-pagination"></div>
 </div>
 
-<!-- 🔹 Sección: WEEKLY DISCOVERY -->
-<section class="weekly-section">
-  <h2>WEEKLY DISCOVERY</h2>
-
-  <div class="weekly-grid">
-    <!-- 🔗 Cada tarjeta se convierte en enlace -->
-    <div
-      class="weekly-item"
-      *ngFor="let item of weekly"
-      [routerLink]="item.link"
-    >
-      <img [src]="item.img" [alt]="item.title" />
-      <h3>{{ item.title }}</h3>
-    </div>
-  </div>
-</section>
-
-<!-- 🔹 Sección: Productos Destacados -->
+<!-- 🔹 Sección: PRODUCTOS DESTACADOS -->
 <section class="featured-products">
   <h2>Productos Destacados</h2>
 
