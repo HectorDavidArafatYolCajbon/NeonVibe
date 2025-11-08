@@ -10,7 +10,7 @@
     <!-- Formulario -->
     <div class="form-content">
       <h2>Sign Up</h2>
-      <form #signupForm="ngForm" (ngSubmit)="submitForm(signupForm)">
+      <form #signupForm="ngForm" (ngSubmit)="submitForm(signupForm)" novalidate>
         <div class="form-group">
           <label for="fullName">Full Name</label>
           <input type="text" id="fullName" name="fullName" ngModel required />

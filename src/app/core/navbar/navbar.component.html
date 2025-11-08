@@ -41,6 +41,16 @@
 
     <!-- 🔹 Íconos a la derecha (solo si NO es modo admin) -->
     <div class="icons" *ngIf="!isAdminView">
+      <!-- Botón de administración (solo visible para admin) -->
+      <button
+        *ngIf="isAdmin"
+        mat-icon-button
+        aria-label="Panel de administración"
+        routerLink="/admin"
+        matTooltip="Panel de administración">
+        <mat-icon>settings</mat-icon>
+      </button>
+
       <button mat-icon-button aria-label="Carrito de compras" routerLink="/carrito">
         <mat-icon>shopping_cart</mat-icon>
       </button>

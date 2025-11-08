@@ -8,19 +8,37 @@ import Swal from 'sweetalert2';
 import { Marca } from '../../../models/marca.model';
 import { Categoria } from '../../../models/categoria.model';
 
+interface InventarioStock {
+  id_inventario: number;
+  id_variante: number;
+  stock: number;
+}
+
+interface Variante {
+  id_variante: number;
+  talla: string;
+  precio_venta: number;
+  precio_costo: number;
+  descuento: number;
+  stock?: InventarioStock;
+  modelo?: string;
+  color?: string;
+}
+
 interface Producto {
   id_producto: number;
   nombre: string;
   descripcion: string;
-  id_marca?: number;
-  id_categoria?: number;
-  genero?: string;
-  precio: number;
-  stock: number;
+  id_marca: number;
+  id_categoria: number;
+  genero: string;
   activo: boolean;
   marca?: Marca;
   categoria?: Categoria;
-  imagenes?: string[];
+  precio_venta?: number;
+  precio_costo?: number;
+  descuento?: number;
+  variantes?: Variante[];
 }
 
 @Component({
@@ -35,6 +53,84 @@ export class ProductosComponent implements OnInit, OnDestroy {
   /** Lista filtrada que se muestra en pantalla */
   filtrados: Producto[] = [];
 
+  /** Control del modal */
+  modalAbierto = false;
+  pasoActual = 1; // 1: Producto, 2: Variantes
+
+  /** Estado de edición */
+  editandoProducto = false;
+  productoSeleccionado: Producto | undefined;
+
+  /** Formulario para variantes */
+  varianteForm: FormGroup;
+  variantes: any[] = [];
+
+  /** Tallas disponibles */
+  tallas = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  /** Métodos de cálculo para producto */
+  getStockTotal(producto: Producto): string {
+    try {
+      if (!producto.variantes?.length) return '0';
+
+      const stockInfo = producto.variantes
+        .filter(v => v.talla)
+        .map(v => {
+          const stockData = v.stock;
+          return `${v.talla}: ${stockData?.stock || 0}`;
+        })
+        .join(' | ');
+
+      return stockInfo || '0';
+    } catch (error) {
+      console.error('Error al calcular stock:', error);
+      return '0';
+    }
+  }
+
+  getStockPorTalla(producto: Producto): { [talla: string]: number } {
+    const stockPorTalla: { [talla: string]: number } = {};
+
+    if (!producto.variantes) return stockPorTalla;
+
+    producto.variantes.forEach(variante => {
+      if (variante.talla && variante.stock) {
+        stockPorTalla[variante.talla] = variante.stock.stock;
+      }
+    });
+
+    return stockPorTalla;
+  }  getPrecioPromedio(producto: Producto, tipo: 'venta' | 'costo'): number {
+    try {
+      if (!producto.variantes?.length) return 0;
+
+      const preciosValidos = producto.variantes
+        .map(v => tipo === 'venta' ? v.precio_venta : v.precio_costo)
+        .filter(precio => precio > 0);
+
+      if (!preciosValidos.length) return 0;
+
+      return Math.min(...preciosValidos);
+    } catch (error) {
+      console.error(`Error al obtener precio ${tipo}:`, error);
+      return 0;
+    }
+  }
+
+  getDescuentoPromedio(producto: Producto): number {
+    try {
+      if (!producto.variantes?.length) return 0;
+
+      const descuentos = producto.variantes
+        .map(v => v.descuento || 0);
+
+      return Math.max(...descuentos, 0);
+    } catch (error) {
+      console.error('Error al obtener descuento:', error);
+      return 0;
+    }
+  }
+
   /** Indicador de carga */
   cargando = false;
 
@@ -42,12 +138,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   marcas: Marca[] = [];
   categorias: Categoria[] = [];
 
-  /** Control de edición */
-  editandoProducto: boolean = false;
-  productoSeleccionado?: Producto;
-
   /** Manejo de imágenes */
-  selectedImages: { file: File; preview: string }[] = [];
+  selectedImages: { url: string; preview: string }[] = [];
 
   /** Formulario reactivo */
   productoForm: FormGroup;
@@ -64,16 +156,60 @@ export class ProductosComponent implements OnInit, OnDestroy {
     private categoriaService: CategoriaService,
     private fb: FormBuilder
   ) {
+    // Formulario del producto
     this.productoForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       descripcion: ['', [Validators.required, Validators.minLength(10)]],
       id_marca: [0, [Validators.required, Validators.min(1)]],
       id_categoria: [0, [Validators.required, Validators.min(1)]],
       genero: ['', Validators.required],
-      precio: [0, [Validators.required, Validators.min(0.01)]],
-      stock: [0, [Validators.required, Validators.min(0)]],
-      imagenes: [[]]
+      activo: [true]
     });
+
+    // Formulario de variante
+    this.varianteForm = this.fb.group({
+      modelo: ['', [Validators.required]],
+      color: [''],
+      talla: ['', Validators.required],
+      sku: ['', Validators.required],
+      barcode: ['', Validators.required],
+      precio_venta: [0, [Validators.required, Validators.min(0.01)]],
+      precio_costo: [0, [Validators.required, Validators.min(0.01)]],
+      descuento: [0, [Validators.min(0), Validators.max(100)]],
+      imagen_url: [''],
+      activo: [true]
+    });
+  }
+
+  /** Totales de inventario sobre la lista filtrada (precio x stock) */
+  get totalCostoInventarioFiltrado(): number {
+    try {
+      return (this.filtrados || []).reduce((accP, p) => {
+        const sumProducto = (p.variantes || []).reduce((accV, v) => {
+          const stock = Number(v?.stock?.stock) || 0;
+          const costo = Number(v?.precio_costo) || 0;
+          return accV + stock * costo;
+        }, 0);
+        return accP + sumProducto;
+      }, 0);
+    } catch {
+      return 0;
+    }
+  }
+
+  get totalVentaInventarioFiltrado(): number {
+    try {
+      return (this.filtrados || []).reduce((accP, p) => {
+        const sumProducto = (p.variantes || []).reduce((accV, v) => {
+          const stock = Number(v?.stock?.stock) || 0;
+          const venta = Number(v?.precio_venta) || 0;
+          return accV + stock * venta;
+        }, 0);
+        return accP + sumProducto;
+      }, 0);
+    } catch {
+      return 0;
+    }
   }
 
   /** Al iniciar, cargamos datos necesarios y configuramos el buscador */
@@ -114,14 +250,33 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** 🔹 Obtener todos los productos */
+  /** Cargar productos */
   cargarProductos(): void {
     this.cargando = true;
-    this.productosService.getProductos().subscribe({
-      next: (data) => {
-        this.productos = data;
-        this.filtrados = data; // mostrar todos al inicio
+    this.productosService.getProductos(false).subscribe({
+      next: (productos) => {
+        console.log('Productos raw:', productos); // Para debug
+        // Para cada producto, obtenemos sus variantes y stock
+        productos.forEach(producto => {
+          if (producto.variantes) {
+            producto.variantes = producto.variantes.map((variante: any) => {
+              console.log('Variante:', variante); // Para debug
+              return {
+                ...variante,
+                precio_venta: parseFloat(variante.precio_venta) || 0,
+                precio_costo: parseFloat(variante.precio_costo) || 0,
+                descuento: parseFloat(variante.descuento) || 0,
+                stock: variante.stock || { stock: 0 }
+              };
+            });
+          }
+        });
+
+        this.productos = productos;
+        this.filtrados = productos;
         this.cargando = false;
+
+        console.log('Productos cargados:', productos);
       },
       error: (err) => {
         console.error('❌ Error al obtener productos:', err);
@@ -204,19 +359,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Manejo de imágenes */
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      Array.from(input.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.selectedImages.push({
-            file,
-            preview: e.target?.result as string
-          });
-        };
-        reader.readAsDataURL(file);
+  /** Agregar URL de imagen */
+  addImageUrl(url: string): void {
+    if (url && url.trim()) {
+      this.selectedImages.push({
+        url: url.trim(),
+        preview: url.trim()
       });
     }
   }
@@ -226,7 +374,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.selectedImages.splice(index, 1);
   }
 
-  /** 🔹 Crear o actualizar producto */
+  /** 🔹 Crear producto y pasar a variantes */
   async guardarProducto(): Promise<void> {
     if (!this.formularioValido()) {
       Swal.fire({
@@ -237,50 +385,121 @@ export class ProductosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Preparar datos del producto
-    const productoData = {
-      ...this.productoForm.value,
-      imagenes: await Promise.all(
-        this.selectedImages.map(async img => {
-          // Aquí iría la lógica para subir la imagen y obtener su URL
-          // Por ahora solo retornamos la preview
-          return img.preview;
-        })
-      )
+    this.cargando = true;
+
+    try {
+      const productoData = this.productoForm.value;
+      const response = await this.productosService.crearProducto(productoData).toPromise();
+
+      this.productoSeleccionado = response;
+      this.pasoActual = 2; // Avanzar al paso de variantes
+      this.cargando = false;
+
+    } catch (err: any) {
+      this.cargando = false;
+      console.error('Error al guardar producto:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.error?.message || 'No se pudo crear el producto'
+      });
+    }
+  }
+
+  /** Agregar variante al producto */
+  async agregarVariante(): Promise<void> {
+    if (!this.varianteForm.valid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario Incompleto',
+        text: 'Por favor completa todos los campos de la variante'
+      });
+      return;
+    }
+
+    const formValues = this.varianteForm.value;
+    const varianteData = {
+      id_producto: this.productoSeleccionado?.id_producto,
+      modelo: formValues.modelo,
+      color: formValues.color,
+      talla: formValues.talla,
+      sku: formValues.sku,
+      barcode: formValues.barcode,
+      precio_venta: formValues.precio_venta,
+      precio_costo: formValues.precio_costo,
+      descuento: formValues.descuento,
+      imagen_url: this.selectedImages.length > 0 ? this.selectedImages[0].url : null,
+      activo: formValues.activo
     };
 
     this.cargando = true;
 
-    // Decidir si crear o actualizar
-    const observable = this.editandoProducto
-      ? this.productosService.actualizarProducto(this.productoSeleccionado!.id_producto, productoData)
-      : this.productosService.crearProducto(productoData);
+    try {
+      const variante = await this.productosService.crearVariante(varianteData).toPromise();
 
-    observable.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: () => {
-        this.cargando = false;
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: `Producto ${this.editandoProducto ? 'actualizado' : 'creado'} correctamente`,
-          timer: 1500,
-          showConfirmButton: false
-        });
-        this.limpiarFormulario();
-        this.cargarProductos();
-      },
-      error: (err) => {
-        this.cargando = false;
-        console.error('Error al guardar producto:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: err.error?.message || `No se pudo ${this.editandoProducto ? 'actualizar' : 'crear'} el producto`
-        });
+      // Si hay imágenes, las guardamos
+      if (this.selectedImages.length > 0) {
+        await Promise.all(this.selectedImages.map((img, index) =>
+          this.productosService.agregarImagenVariante({
+            id_variante: variante.id_variante,
+            url_imagen: img.url,
+            orden: index + 1
+          }).toPromise()
+        ));
       }
+
+      this.variantes.push(variante);
+      this.varianteForm.reset();
+      this.selectedImages = [];
+      this.cargando = false;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Variante agregada',
+        text: 'La variante se ha agregado correctamente',
+        timer: 1500,
+        showConfirmButton: false
+      });
+
+    } catch (err: any) {
+      this.cargando = false;
+      console.error('Error al agregar variante:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.error?.message || 'No se pudo agregar la variante'
+      });
+    }
+  }
+
+  /** Finalizar creación del producto */
+  finalizarCreacion(): void {
+    if (this.variantes.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sin variantes',
+        text: 'Debes agregar al menos una variante al producto'
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Producto creado',
+      text: 'El producto y sus variantes se han creado correctamente'
     });
+
+    this.limpiarFormulario();
+    this.cargarProductos();
+    this.resetearModal();
+  }
+
+  /** Resetear estado del modal */
+  resetearModal(): void {
+    this.pasoActual = 1;
+    this.variantes = [];
+    this.selectedImages = [];
+    this.modalAbierto = false;
   }
 
   /** Cargar producto para edición */
@@ -290,18 +509,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.productoForm.patchValue({
       nombre: producto.nombre,
       descripcion: producto.descripcion,
-      id_marca: producto.id_marca || 0,
-      id_categoria: producto.id_categoria || 0,
-      genero: producto.genero || '',
-      precio: producto.precio,
-      stock: producto.stock,
-      imagenes: producto.imagenes || []
+      id_marca: producto.id_marca,
+      id_categoria: producto.id_categoria,
+      genero: producto.genero,
+      activo: producto.activo
     });
-    // Cargar imágenes existentes como previews
-    this.selectedImages = producto.imagenes?.map(url => ({
-      file: new File([], "existing"), // dummy file
-      preview: url
-    })) || [];
+    this.modalAbierto = true;
+    this.pasoActual = 1; // Start with product edit
+    this.variantes = producto.variantes || [];
   }
 
   /** 🔹 Activar / desactivar producto */

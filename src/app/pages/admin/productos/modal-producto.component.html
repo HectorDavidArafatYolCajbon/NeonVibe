@@ -1,0 +1,293 @@
+<div class="modal">
+  <div class="modal-content">
+    <!-- Overlay de carga -->
+    <div class="loading-overlay" *ngIf="cargando">
+      <div class="spinner"></div>
+      <div class="loading-text">Guardando…</div>
+    </div>
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-title">
+        <h3>{{ editMode ? (pasoActual === 1 ? '✏️ Editar Producto' : '✏️ Editar Variantes') : (pasoActual === 1 ? '✨ Crear Nuevo Producto' : '🎨 Agregar Variantes') }}</h3>
+      </div>
+      <button class="btn-close" (click)="cerrar()">×</button>
+    </div>
+
+    <!-- Barra Totales (visible solo en Paso 2) -->
+    <div class="totales-sticky" *ngIf="pasoActual === 2">
+      <div class="totales-inner">
+        <div class="item"><span>Costo total</span><strong>Q{{ totalCostoConFormulario | number:'1.2-2' }}</strong></div>
+        <div class="item"><span>Venta total</span><strong>Q{{ totalVentaConFormulario | number:'1.2-2' }}</strong></div>
+        <div class="item" *ngIf="variantes.length > 0"><span>Valor costo inventario</span><strong>Q{{ totalCostoInventarioConFormulario | number:'1.2-2' }}</strong></div>
+        <div class="item" *ngIf="variantes.length > 0"><span>Valor venta inventario</span><strong>Q{{ totalVentaInventarioConFormulario | number:'1.2-2' }}</strong></div>
+      </div>
+    </div>
+
+    <!-- Paso 1: Producto -->
+    <div class="modal-body" *ngIf="pasoActual === 1">
+      <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre del producto*</label>
+            <input
+              id="nombre"
+              formControlName="nombre"
+              type="text"
+              placeholder="Nombre del producto" />
+            <small class="error-message" *ngIf="mostrarError('nombre')">
+              {{ mostrarError('nombre') }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion">Descripción*</label>
+            <input
+              id="descripcion"
+              formControlName="descripcion"
+              type="text"
+              placeholder="Descripción detallada" />
+            <small class="error-message" *ngIf="mostrarError('descripcion')">
+              {{ mostrarError('descripcion') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="genero">Género*</label>
+            <select id="genero" formControlName="genero">
+              <option value="">Seleccione género</option>
+              <option value="HOMBRE">Hombre</option>
+              <option value="MUJER">Mujer</option>
+            </select>
+            <small class="error-message" *ngIf="mostrarError('genero')">
+              {{ mostrarError('genero') }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="id_marca">Marca*</label>
+            <div class="inline-field">
+              <select id="id_marca" formControlName="id_marca">
+                <option [ngValue]="0">Seleccione marca</option>
+                <option *ngFor="let marca of marcas" [ngValue]="marca.id_marca">
+                  {{marca.nombre}}
+                </option>
+              </select>
+              <button type="button" class="btn-add-inline" (click)="crearMarcaRapida()" title="Crear nueva marca">
+                <span>+ Marca</span>
+              </button>
+            </div>
+            <small class="error-message" *ngIf="mostrarError('id_marca')">
+              {{ mostrarError('id_marca') }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="id_categoria">Categoría*</label>
+            <select id="id_categoria" formControlName="id_categoria">
+              <option [ngValue]="0">Seleccione categoría</option>
+              <option *ngFor="let cat of categorias" [ngValue]="cat.id_categoria">
+                {{cat.nombre}}
+              </option>
+            </select>
+            <small class="error-message" *ngIf="mostrarError('id_categoria')">
+              {{ mostrarError('id_categoria') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-clear" (click)="cerrar()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="productoForm.invalid || cargando">
+            {{ editMode ? 'Actualizar' : 'Siguiente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Paso 2: Variantes -->
+    <div class="modal-body" *ngIf="pasoActual === 2">
+      <!-- Lista de variantes agregadas -->
+      <div class="variantes-lista" *ngIf="variantes.length > 0">
+        <h4>Variantes agregadas:</h4>
+        <div class="variante-item" *ngFor="let v of variantes; let i = index" [class.editing]="editingVariant && editingIndex === i">
+          <div class="variante-info">
+            <span>Modelo: {{v.modelo}}</span>
+            <span>Color: {{v.color || 'N/A'}}</span>
+            <span>Talla: {{v.talla}}</span>
+          </div>
+          <div class="variante-codes">
+            <span>SKU: {{v.sku}}</span>
+            <span>Barcode: {{v.barcode}}</span>
+          </div>
+          <div class="variante-prices">
+            <span>Costo: Q{{ v.precio_costo | number:'1.0-2' }}</span>
+            <span>Venta: Q{{ v.precio_venta | number:'1.0-2' }}</span>
+            <span>Descuento: {{v.descuento}}%</span>
+            <span>Stock: {{v.stock?.stock || 0}}</span>
+          </div>
+          <div class="variante-actions">
+            <button type="button" (click)="startEditVariante(v,i)" *ngIf="!editingVariant || editingIndex !== i" [disabled]="cargando">✏️ Editar</button>
+            <button type="button" class="btn-save" (click)="guardarEdicionVariante()" *ngIf="editingVariant && editingIndex === i" [disabled]="cargando">💾 Guardar</button>
+            <button type="button" class="btn-cancel" (click)="cancelEditVariante()" *ngIf="editingVariant && editingIndex === i" [disabled]="cargando">✖ Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón para copiar última variante -->
+      <div class="copy-variant-section" *ngIf="variantes.length > 0">
+        <button
+          type="button"
+          class="btn-copy"
+          (click)="copiarUltimaVariante()"
+          [title]="'Copiar datos de la última variante. Se copiarán todos los datos excepto talla, SKU, código de barras y stock'">
+          📋 Copiar última variante
+        </button>
+      </div>
+
+      <!-- Formulario para agregar variante -->
+      <form [formGroup]="varianteForm">
+        <!-- Información básica -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="modelo">Modelo*</label>
+            <input
+              id="modelo"
+              formControlName="modelo"
+              type="text"
+              placeholder="Modelo del producto" />
+          </div>
+
+          <div class="form-group">
+            <label for="color">Color</label>
+            <input
+              id="color"
+              formControlName="color"
+              type="text"
+              placeholder="Color del producto" />
+          </div>
+
+          <div class="form-group">
+            <label for="talla">Talla*</label>
+            <select id="talla" formControlName="talla">
+              <option value="">Seleccione talla</option>
+              <option *ngFor="let t of tallas" [value]="t">{{t}}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Códigos de identificación -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="sku">SKU*</label>
+            <input
+              id="sku"
+              formControlName="sku"
+              type="text"
+              placeholder="Código SKU" />
+          </div>
+
+          <div class="form-group">
+            <label for="barcode">Código de Barras*</label>
+            <input
+              id="barcode"
+              formControlName="barcode"
+              type="text"
+              placeholder="Código de barras" />
+          </div>
+        </div>
+
+        <!-- Precios y stock -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="precio_costo">Precio de Costo*</label>
+            <input
+              id="precio_costo"
+              formControlName="precio_costo"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Precio de costo" />
+          </div>
+
+          <div class="form-group">
+            <label for="precio_venta">Precio de Venta*</label>
+            <input
+              id="precio_venta"
+              formControlName="precio_venta"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Precio de venta" />
+          </div>
+
+          <div class="form-group">
+            <label for="descuento">Descuento (%)</label>
+            <input
+              id="descuento"
+              formControlName="descuento"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              placeholder="Porcentaje de descuento" />
+          </div>
+
+          <div class="form-group">
+            <label for="stock_inicial">Stock Inicial*</label>
+            <input
+              id="stock_inicial"
+              formControlName="stock_inicial"
+              type="number"
+              min="0"
+              placeholder="Cantidad inicial en stock" />
+          </div>
+        </div>
+
+        <!-- Selector de imágenes -->
+        <div class="form-row url-upload">
+          <div class="form-group">
+            <label for="imageUrl">URL de la imagen</label>
+            <div class="url-input-group">
+              <input
+                id="imageUrl"
+                type="url"
+                placeholder="Ingrese la URL de la imagen"
+                #imageUrl />
+              <button type="button" (click)="addImageUrl(imageUrl.value); imageUrl.value = ''">
+                📸 Agregar imagen
+              </button>
+            </div>
+          </div>
+          <div class="preview-images" *ngIf="selectedImages.length > 0">
+            <div class="image-preview" *ngFor="let img of selectedImages; let i = index">
+              <img [src]="img.preview" alt="Preview" />
+              <button type="button" class="remove-image" (click)="removeImage(i)">❌</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-clear" (click)="cerrar()" [disabled]="cargando">
+            Cancelar
+          </button>
+          <button type="button" (click)="editingVariant ? guardarEdicionVariante() : agregarVariante()"
+                  [disabled]="varianteForm.invalid || cargando">
+            {{ editingVariant ? 'Guardar Cambios Variante' : (editMode ? 'Agregar Variante' : 'Agregar Variante') }}
+          </button>
+          <button type="button" *ngIf="editingVariant" (click)="cancelEditVariante()" [disabled]="cargando">Cancelar Edición</button>
+          <button type="button" class="btn-submit" (click)="finalizarCreacion()"
+                  [disabled]="!variantes.length || cargando">
+            {{ editMode ? 'Guardar Cambios' : 'Finalizar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

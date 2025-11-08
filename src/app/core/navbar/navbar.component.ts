@@ -12,7 +12,8 @@ import { filter } from 'rxjs/operators';
 export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   currentUser: any = null;
-  isAdminView = false; // 👈 Modo “navbar reducido” del admin
+  isAdminView = false; // 👈 Modo "navbar reducido" del admin
+  isAdmin = false; // 👈 Para verificar si el usuario es administrador
   private userSubscription!: Subscription;
   private routeSubscription!: Subscription;
 
@@ -37,7 +38,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // 🔍 Detectar si el usuario es admin y está en /admin
   private checkIfAdminView(): void {
     const user = this.currentUser;
-    const isAdminUser =
+    this.isAdmin =
       user &&
       (user.id_rol === 1 ||
         user.id_usuario === 1 ||
@@ -46,7 +47,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         (typeof user.rol === 'object' && user.rol.nombre_rol?.toLowerCase() === 'admin'));
 
     const isAdminRoute = this.router.url.startsWith('/admin');
-    this.isAdminView = isAdminUser && isAdminRoute;
+    this.isAdminView = this.isAdmin && isAdminRoute;
   }
 
   logout(): void {

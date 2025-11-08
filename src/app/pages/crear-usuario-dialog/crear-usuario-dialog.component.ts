@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 

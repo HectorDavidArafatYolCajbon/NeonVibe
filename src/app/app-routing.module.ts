@@ -28,6 +28,7 @@ import { ZapatosMujeresComponent } from './pages/mujeres/zapatos-mujeres/zapatos
 import { AdminComponent } from './pages/admin/admin.component';
 import { UsuariosComponent } from './pages/admin/usuarios/usuarios.component'; // 👈 agregado
 import { ProductosComponent } from './pages/admin/productos/productos.component';
+import { ReportesComponent } from './pages/admin/reportes/reportes.component';
 
 const routes: Routes = [
   // 🔹 Página de inicio
@@ -65,7 +66,7 @@ const routes: Routes = [
   { path: 'marcas', component: MarcasComponent, title: 'Marcas' },
   { path: 'admin', component: AdminComponent },
   { path: 'admin/usuarios', component: UsuariosComponent },
-   { path: 'admin/productos', component: ProductosComponent },
+  { path: 'admin/productos', component: ProductosComponent },
 
   // 🔹 ADMIN con subrutas
   {
@@ -73,9 +74,7 @@ const routes: Routes = [
     component: AdminComponent,
     children: [
       { path: 'usuarios', component: UsuariosComponent, title: 'Gestión de Usuarios' },
-      // 🔹 Aquí más adelante podrás agregar:
-      // { path: 'productos', component: ProductosComponent },
-      // { path: 'reportes', component: ReportesComponent },
+      { path: 'reportes', component: ReportesComponent, title: 'Reportes' },
     ],
   },
 

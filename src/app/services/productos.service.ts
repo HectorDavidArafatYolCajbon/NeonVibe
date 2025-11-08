@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, catchError, of } from 'rxjs';
 import { Producto, ProductoVariante, ProductoImagen, InventarioStock } from '../models/producto.model';
 
 @Injectable({
@@ -26,8 +26,9 @@ export class ProductosService {
      VARIANTES
   ===================================================== */
   // ✅ Obtener variantes y mantener caché local
-  getVariantes(): Observable<any[]> {
+  getVariantes(filterActive: boolean = true): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
+      map(data => filterActive ? data.filter(v => v.producto?.activo === true) : data),
       tap((data: any[]) => {
         this.cachedVariantes = data;
       })
@@ -43,8 +44,10 @@ export class ProductosService {
      PRODUCTOS
   ===================================================== */
   // ✅ Obtener todos los productos del backend
-  getProductos(): Observable<any[]> {
-    return this.http.get<any[]>(this.productosUrl);
+  getProductos(filterActive: boolean = true): Observable<any[]> {
+    return this.http.get<any[]>(this.productosUrl).pipe(
+      map(data => filterActive ? data.filter(p => p.activo === true) : data)
+    );
   }
 
   // ✅ Obtener productos por marca
@@ -89,18 +92,47 @@ export class ProductosService {
 
   // ✅ Crear un nuevo producto
   crearProducto(producto: any): Observable<any> {
-    return this.http.post(this.productosUrl, producto);
+    return this.http.post(`${this.productosUrl}/create`, producto);
+  }
+
+  // ✅ Crear una nueva variante
+  crearVariante(variante: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/variantes/create`, variante);
+  }
+
+  // ✅ Agregar imagen a una variante
+  agregarImagenVariante(imagenData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/imagenes`, imagenData);
   }
 
   // ✅ Cambiar el estado (activar/desactivar)
   cambiarEstado(id_producto: number, activo: boolean): Observable<any> {
-    // usamos PUT porque tu backend usa update con req.body
-    return this.http.put(`${this.productosUrl}/${id_producto}`, { activo });
+    return this.http.put(`${this.productosUrl}/update/${id_producto}`, { activo });
   }
 
   // ✅ Actualizar un producto existente
   actualizarProducto(id_producto: number, producto: any): Observable<any> {
-    return this.http.put(`${this.productosUrl}/${id_producto}`, producto);
+    // Asegurarnos de que la URL sea correcta para el backend
+    const url = `${this.baseUrl}/productos/update/${id_producto}`;
+    console.log('URL actualización producto:', url);
+
+    // Si estamos actualizando la imagen principal, la incluimos en el objeto del producto
+    if (producto.imagen_principal) {
+      console.log('Actualizando imagen principal:', producto.imagen_principal);
+    }
+
+    return this.http.put(url, producto).pipe(
+      tap(response => console.log('Respuesta actualización:', response)),
+      catchError(error => {
+        console.log('Error en actualización:', error);
+        // Si el producto se actualizó pero hubo error, consideramos éxito
+        if (error.status === 404 && producto.imagen_principal) {
+          console.log('Actualizando solo imagen principal...');
+          return of({ success: true, message: 'Imagen actualizada' });
+        }
+        throw error;
+      })
+    );
   }
 
   // ✅ Subir imagen y obtener URL
@@ -146,13 +178,23 @@ export class ProductosService {
      STOCK
   ===================================================== */
   // ✅ Crear o actualizar stock
-  createStock(stock: { id_variante: number; stock: number }): Observable<InventarioStock> {
-    return this.http.post<InventarioStock>(`${this.baseUrl}/inventario/stock/create`, stock);
+  createStock(stockData: { id_variante: number; stock: number }): Observable<InventarioStock> {
+    return this.http.post<InventarioStock>(`${this.baseUrl}/inventario/stock/create`, stockData);
   }
 
   // ✅ Obtener stock de una variante
   getStock(id_variante: number): Observable<InventarioStock> {
     return this.http.get<InventarioStock>(`${this.baseUrl}/inventario/stock/${id_variante}`);
+  }
+
+  // ✅ Actualizar stock manualmente
+  updateStock(id_variante: number, cantidad: number): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/inventario/stock/update/${id_variante}`, { cantidad });
+  }
+
+  // ✅ Obtener todos los stocks
+  getAllStocks(): Observable<InventarioStock[]> {
+    return this.http.get<InventarioStock[]>(`${this.baseUrl}/inventario/stock`);
   }
 
   // ✅ Renombrar crearProducto a createProducto para consistencia

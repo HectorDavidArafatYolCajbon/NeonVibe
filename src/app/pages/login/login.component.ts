@@ -40,7 +40,6 @@ export class LoginComponent {
         console.log('✅ Login exitoso:', response);
         console.log('📦 Stored:', localStorage.getItem('auth_user'));
 
-        // ⚠️ Si el backend ya devuelve el usuario dentro del login, lo usamos directamente
         const userLogin = response?.user || response;
 
         // ✅ Detectar si es administrador según los datos del login
@@ -117,9 +116,9 @@ export class LoginComponent {
         console.error('❌ Error en login:', error);
         this.loading = false;
 
-        if (error.message === 'CUENTA_INACTIVA') {
+        if (error.status === 403) {
           Swal.fire({
-            title: 'Cuenta Inactiva',
+            title: 'Cuenta Desactivada',
             text: 'Tu cuenta está actualmente desactivada. Por favor, contacta con el administrador para reactivarla.',
             icon: 'warning',
             confirmButtonText: 'Entendido'

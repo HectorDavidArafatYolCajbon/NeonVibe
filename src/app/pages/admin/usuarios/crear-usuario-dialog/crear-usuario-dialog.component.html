@@ -1,0 +1,81 @@
+<mat-dialog-content>
+  <div class="dialog-content">
+    <h2 mat-dialog-title>Crear Nuevo Usuario</h2>
+
+    <form [formGroup]="usuarioForm" class="usuario-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre completo</mat-label>
+          <input matInput formControlName="nombre" required>
+          <mat-error *ngIf="usuarioForm.get('nombre')?.hasError('required')">
+            El nombre es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electrónico</mat-label>
+          <input matInput formControlName="email" type="email" required>
+          <mat-error *ngIf="usuarioForm.get('email')?.hasError('required')">
+            El correo es requerido
+          </mat-error>
+          <mat-error *ngIf="usuarioForm.get('email')?.hasError('email')">
+            Ingresa un correo válido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password" required>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="usuarioForm.get('password')?.hasError('required')">
+            La contraseña es requerida
+          </mat-error>
+          <mat-error *ngIf="usuarioForm.get('password')?.hasError('minlength')">
+            La contraseña debe tener al menos 6 caracteres
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="telefono" required>
+          <mat-error *ngIf="usuarioForm.get('telefono')?.hasError('required')">
+            El teléfono es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>NIT (opcional)</mat-label>
+          <input matInput formControlName="nit">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Dirección (opcional)</mat-label>
+          <textarea matInput formControlName="direccion" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-raised-button color="primary"
+          (click)="guardarUsuario()"
+          [disabled]="usuarioForm.invalid || loading">
+    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+    <span *ngIf="!loading">Guardar Usuario</span>
+  </button>
+</mat-dialog-actions>
